@@ -31,6 +31,11 @@ namespace Codewars_Bot.Services
 
 		private async Task<string> SaveNewUser(Activity activity)
 		{
+			if ((bool)activity.Conversation.IsGroup)
+			{
+				return string.Empty;
+			}
+
 			var databaseConnectionService = new DatabaseConnectionService();
 			var codewarsConnectionService = new CodewarsConnectionService();
 
