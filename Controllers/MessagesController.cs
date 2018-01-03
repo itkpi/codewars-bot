@@ -15,7 +15,6 @@ namespace Codewars_Bot
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
 			var databaseConnectionService = new DatabaseConnectionService();
-			databaseConnectionService.AuditMessageInDatabase(JsonConvert.SerializeObject(activity));
 
 			try
 			{
@@ -25,7 +24,7 @@ namespace Codewars_Bot
 					ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
 					var messageService = new MessageService();
-					var responseMessage = await messageService.MessageHandler(activity.Text);
+					var responseMessage = await messageService.MessageHandler(activity);
 
 					if (!string.IsNullOrEmpty(responseMessage))
 					{

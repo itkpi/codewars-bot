@@ -111,9 +111,9 @@ namespace Codewars_Bot.Services
             {
                 using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
                 {
-                    string query = "INSERT INTO [User].[Users](CodewarsUsername,CodewarsFullname,TelegramUsername,DateTime,Points) values(@CodewarsUsername,@CodewarsFullname,@TelegramUsername,GETDATE(),@Points); SELECT CAST(SCOPE_IDENTITY() as int)";
+                    string query = "INSERT INTO [User].[Users](CodewarsUsername,CodewarsFullname,TelegramUsername,TelegramId,DateTime,Points) values(@CodewarsUsername,@CodewarsFullname,@TelegramUsername,@TelegramId,GETDATE(),@Points); SELECT CAST(SCOPE_IDENTITY() as int)";
                     var ra = connection.Query<int>(query, user).SingleOrDefault();
-                    return $"Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу:-)";
+                    return $"Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
                 }
             }
             catch (Exception ex)
