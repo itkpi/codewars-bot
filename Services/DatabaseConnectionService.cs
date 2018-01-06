@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using System.Web;
 
 namespace Codewars_Bot.Services
 {
@@ -62,17 +61,9 @@ namespace Codewars_Bot.Services
 					currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(q => q.Points).ToList();
 					var position = 1;
 
-					foreach (var userWithRating in currentWeekUsersRating)
+					foreach (var user in currentWeekUsersRating)
 					{
-						if (position <= 10)
-						{
-							response.Append($"{position}) @{userWithRating.TelegramUsername} **({userWithRating.CodewarsUsername.Replace("_", " ")}) - {userWithRating.Points}** <br/>");
-						}
-						else
-						{
-							response.Append($"{position}) @{userWithRating.TelegramUsername} ({userWithRating.CodewarsUsername.Replace("_", " ")}) - {userWithRating.Points} <br/>");
-
-						}
+						response.Append(FormatUserRatingString(user, position));
 						position++;
 					}
 
@@ -99,7 +90,7 @@ namespace Codewars_Bot.Services
 
 					foreach (var user in users.OrderByDescending(q => q.Points))
 					{
-						response.Append($"@{user.TelegramUsername} ({user.CodewarsUsername.Replace("_", " ")}) - {user.Points} <br/>");
+						response.Append(FormatUserRatingString(user, position));
 						position++;
 					}
 
@@ -152,6 +143,19 @@ namespace Codewars_Bot.Services
 				AuditMessageInDatabase($"EXCEPTION: {ex.Message}, CodewarsUser: {user.CodewarsUsername}");
 				return false;
 			}
+		}
+
+		private string FormatUserRatingString(UserModel user, int position)
+		{
+			var telegramLogin = user.TelegramUsername != null
+				? $"@{user.TelegramUsername}"
+				: "";
+
+			var codewarsLogin = position <= 10
+				? $"**({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}**"
+				: $"({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}";
+
+			return $"{position}) {telegramLogin} {codewarsLogin} <br/>";
 		}
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +10,14 @@ namespace Codewars_Bot.Services
 		public async Task<string> MessageHandler(Activity activity)
 		{
 			var databaseConnectionService = new DatabaseConnectionService();
-			databaseConnectionService.AuditMessageInDatabase(JsonConvert.SerializeObject(activity));
+			var requestContent = new
+			{
+				UserId = activity.From.Id,
+				UserName = activity.From.Name,
+				Message = activity.Text
+			};
+
+			databaseConnectionService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
 
 			switch (activity.Text)
 			{
