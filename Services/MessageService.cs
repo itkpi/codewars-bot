@@ -1,13 +1,14 @@
-﻿using Microsoft.Bot.Connector;
+﻿using Codewars_Bot.Contracts;
+using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Codewars_Bot.Services
 {
-	public class MessageService
+	public class MessageService : IMessageService
 	{
-		public async Task<string> MessageHandler(Activity activity)
+		public async Task<string> MessageHandler(Activity activity) 
 		{
 			var databaseConnectionService = new DatabaseConnectionService();
 			var requestContent = new
