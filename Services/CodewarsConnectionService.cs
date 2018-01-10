@@ -11,7 +11,9 @@ namespace Codewars_Bot.Services
     {
         public async Task<CodewarsResponseModel> GetCodewarsUser(string username)
         {
-            using (var httpClient = new HttpClient())
+			var codewarsUser = new CodewarsResponseModel();
+
+			using (var httpClient = new HttpClient())
             {
                 httpClient.BaseAddress = new Uri ($"https://www.codewars.com/api/v1/users/");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -23,17 +25,12 @@ namespace Codewars_Bot.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
-                    var codewarsResponseModel = JsonConvert.DeserializeObject<CodewarsResponseModel>(responseJson);
-                    return codewarsResponseModel;
+					codewarsUser = JsonConvert.DeserializeObject<CodewarsResponseModel>(responseJson);
+                    
                 }
-                else
-                {
-                    return new CodewarsResponseModel
-                    {
-                        Name = "NOT EXIST"
-                    };
-                }
-            }
+
+				return codewarsUser;
+			}
         }
     }
 }

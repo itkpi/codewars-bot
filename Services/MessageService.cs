@@ -8,7 +8,8 @@ namespace Codewars_Bot.Services
 {
 	public class MessageService : IMessageService
 	{
-		public async Task<string> MessageHandler(Activity activity) 
+
+		public async Task<string> MessageHandler(Activity activity)
 		{
 			var databaseConnectionService = new DatabaseConnectionService();
 			var requestContent = new
@@ -41,12 +42,15 @@ namespace Codewars_Bot.Services
 		private async Task<string> SaveNewUser(Activity activity)
 		{
 			if ((bool)activity.Conversation.IsGroup)
-			{
 				return string.Empty;
-			}
 
 			var databaseConnectionService = new DatabaseConnectionService();
 			var codewarsConnectionService = new CodewarsConnectionService();
+
+			var userFromDb = databaseConnectionService.GetUserById(int.Parse(activity.From.Id));
+
+			if (userFromDb != null)
+				return $"Ви вже зареєстровані в рейтингу Codewars під ніком {userFromDb.CodewarsUsername}";
 
 			var user = new UserModel
 			{
@@ -55,14 +59,9 @@ namespace Codewars_Bot.Services
 				TelegramId = int.Parse(activity.From.Id)
 			};
 
-			if (databaseConnectionService.CheckIfUserExists(user) || user.CodewarsUsername == "start")
-			{
-				return $"Користувач {user.CodewarsUsername} вже зареєстрований";
-			}
-
 			var codewarsUser = await codewarsConnectionService.GetCodewarsUser(user.CodewarsUsername);
 
-			if (codewarsUser.Name == "NOT EXIST")
+			if (codewarsUser == null)
 			{
 				return $"Користувач {user.CodewarsUsername} не зареєстрований на codewars.com";
 			}

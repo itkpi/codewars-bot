@@ -122,26 +122,12 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		public bool CheckIfUserExists(UserModel user)
+		public UserModel GetUserById(int id)
 		{
-			try
+			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
 			{
-				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
-				{
-					string query = "SELECT * FROM [User].[Users]";
-					var dbUser = connection.Query<UserModel>(query).ToList().FirstOrDefault(q => q.CodewarsUsername == user.CodewarsUsername);
-
-					if (dbUser != null)
-					{
-						return true;
-					}
-					return false;
-				}
-			}
-			catch (Exception ex)
-			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}, CodewarsUser: {user.CodewarsUsername}");
-				return false;
+				string query = $"SELECT * FROM [User].[Users] WHERE Id = {id}";
+				return connection.QueryFirst<UserModel>(query);
 			}
 		}
 
