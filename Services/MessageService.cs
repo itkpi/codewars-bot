@@ -2,6 +2,7 @@
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Codewars_Bot.Services
@@ -46,6 +47,14 @@ namespace Codewars_Bot.Services
 
 			var databaseConnectionService = new DatabaseConnectionService();
 			var codewarsConnectionService = new CodewarsConnectionService();
+			var regex = new Regex(@"^\w+$", RegexOptions.IgnoreCase);
+
+			if (!regex.Match(activity.Text).Success)
+			{
+				return $@"Логін Codewars має містити букви, цифри і знак '_' <br/><br/>
+					Якщо ви хотіли дати команду боту -- перевірте, чи в ту сторону стоїть слеш на початку.
+					Певні, що це таки ваш нік? Пишіть йому: @maksim36ua";
+			}
 
 			var userFromDb = databaseConnectionService.GetUserById(int.Parse(activity.From.Id));
 
@@ -63,7 +72,7 @@ namespace Codewars_Bot.Services
 
 			if (codewarsUser == null)
 			{
-				return $"Користувач {user.CodewarsUsername} не зареєстрований на codewars.com";
+				return $"Користувач {user.CodewarsUsername} не зареєстрований на Codewars";
 			}
 			else
 			{
@@ -91,22 +100,24 @@ namespace Codewars_Bot.Services
 			var databaseConnectionService = new DatabaseConnectionService();
 			var rating = databaseConnectionService.GetWeeklyRating();
 
-			return rating + "<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua";
+			return rating + @"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
+				Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua";
 		}
 
 		private string ShowFaq()
 		{
-			var response = new StringBuilder();
-
-			response.Append("Вітаємо в клані ІТ КРІ на Codewars! <br/><br/>codewars.com -- це знаменитий сайт з задачами для програмістів, за розв'язок яких нараховуються бали. ");
-			response.Append("От цими балами ми і будемо мірятись в кінці кожного тижня. <br/><br/>Цей бот створений для того, щоб зробити реєстрацію в клані максимально швидкою і приємною. ");
-			response.Append("Щоб долучитись до рейтингу треба: <br/>1) Зареєструватись на https://codewars.com <br/>2) Надіслати сюди ваш нікнейм в Codewars. ");
-			response.Append("<br/><br/>Бали оновлюються раз на годину. Також доступні дві команди: <br/>1) /weekly_rating показує поточний рейтинг за цей тиждень. <br/>2) /total_rating відображає загальну кількість балів в кожного користувача");
-			response.Append("<br/><br/>Запрошуйте друзів в клан і гайда рубитись!");
-			response.Append("<br/><br/>P.S: якщо знайшли багу або маєте зауваження -- пишіть йому @maksim36ua");
-
-			response.Append("");
-			return response.ToString();
+			return @"Вітаємо в клані ІТ КРІ на Codewars! 
+			<br/><br/>codewars.com -- це знаменитий сайт з задачами для програмістів, за розв'язок яких нараховуються бали.
+			От цими балами ми і будемо мірятись в кінці кожного тижня. 
+			<br/><br/>Бот створений для того, щоб зробити реєстрацію в клані максимально швидкою і приємною.
+			Щоб долучитись до рейтингу треба: 
+				<br/>1) Зареєструватись на https://codewars.com 
+				<br/>2) Надіслати сюди ваш нікнейм в Codewars.
+			<br/><br/>Бали оновлюються раз на годину. Також доступні дві команди: 
+				<br/>1) /weekly_rating показує поточний рейтинг за цей тиждень. 
+				<br/>2) /total_rating відображає загальну кількість балів в кожного користувача.
+			<br/><br/>Запрошуйте друзів в клан і гайда рубитись!
+			<br/><br/>P.S: якщо знайшли багу або маєте зауваження -- пишіть йому @maksim36ua";
 		}
 	}
 }
