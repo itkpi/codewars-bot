@@ -126,8 +126,8 @@ namespace Codewars_Bot.Services
 		{
 			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
 			{
-				string query = $"SELECT * FROM [User].[Users] WHERE Id = {id}";
-				return connection.QueryFirst<UserModel>(query);
+				string query = $"SELECT * FROM [User].[Users] WHERE TelegramId = {id}";
+				return connection.QueryFirstOrDefault<UserModel>(query);
 			}
 		}
 

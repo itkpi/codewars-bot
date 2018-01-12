@@ -11,7 +11,6 @@ namespace Codewars_Bot.Services
     {
         public async Task<CodewarsResponseModel> GetCodewarsUser(string username)
         {
-			var codewarsUser = new CodewarsResponseModel();
 
 			using (var httpClient = new HttpClient())
             {
@@ -25,11 +24,10 @@ namespace Codewars_Bot.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
-					codewarsUser = JsonConvert.DeserializeObject<CodewarsResponseModel>(responseJson);
-                    
+					return JsonConvert.DeserializeObject<CodewarsResponseModel>(responseJson);
                 }
 
-				return codewarsUser;
+				return null;
 			}
         }
     }
