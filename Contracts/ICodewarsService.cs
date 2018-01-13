@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Connector;
+﻿using Codewars_Bot.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Codewars_Bot.Contracts
 {
-	public interface IMessageService
+	public interface ICodewarsService
 	{
-		Task<string> ProcessMessage(Activity activity);
+		Task<CodewarsResponseModel> GetCodewarsUser(string username);
 	}
 }

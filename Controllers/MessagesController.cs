@@ -6,42 +6,39 @@ using System.Web.Http;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using Codewars_Bot.Services;
+using Codewars_Bot.Contracts;
 
 namespace Codewars_Bot
 {
 	[BotAuthentication]
 	public class MessagesController : ApiController
 	{
+		private IMessageService MessageService { get; set; }
+
+		public MessagesController(IMessageService messageService)
+		{
+			MessageService = messageService;
+		}
+
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
-			var databaseConnectionService = new DatabaseConnectionService();
 
-			try
+			if (activity.Type == ActivityTypes.Message)
 			{
-				if (activity.Type == ActivityTypes.Message)
+				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+				var responseMessage = await MessageService.ProcessMessage(activity);
+
+				if (!string.IsNullOrEmpty(responseMessage))
 				{
-
-					ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
-					var messageService = new MessageService();
-					var responseMessage = await messageService.MessageHandler(activity);
-
-					if (!string.IsNullOrEmpty(responseMessage))
-					{
-						Activity reply = activity.CreateReply($"{responseMessage}");
-						reply.ReplyToId = new Guid().ToString();
-						databaseConnectionService.AuditMessageInDatabase(JsonConvert.SerializeObject(reply));
-						await connector.Conversations.ReplyToActivityAsync(reply);
-					}
-				}
-				else
-				{
-					HandleSystemMessage(activity);
+					Activity reply = activity.CreateReply($"{responseMessage}");
+					reply.ReplyToId = new Guid().ToString();
+					await connector.Conversations.ReplyToActivityAsync(reply);
 				}
 			}
-			catch (Exception ex)
+			else
 			{
-				databaseConnectionService.AuditMessageInDatabase($"ERROR: {ex.Message} {ex.StackTrace}");
+				HandleSystemMessage(activity);
 			}
 
 			var response = Request.CreateResponse(HttpStatusCode.OK);

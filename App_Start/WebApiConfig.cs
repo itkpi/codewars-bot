@@ -8,7 +8,6 @@ namespace Codewars_Bot
     {
         public static void Register(HttpConfiguration config)
         {
-            // Json settings
             config.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             config.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
@@ -19,9 +18,6 @@ namespace Codewars_Bot
                 NullValueHandling = NullValueHandling.Ignore,
             };
 
-            // Web API configuration and services
-
-            // Web API routes
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

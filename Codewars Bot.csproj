@@ -45,6 +45,9 @@
     <Reference Include="Autofac, Version=4.6.2.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>packages\Autofac.4.6.2\lib\net45\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="Autofac.Integration.WebApi, Version=4.1.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>packages\Autofac.WebApi2.4.1.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
+    </Reference>
     <Reference Include="Chronic, Version=0.3.2.0, Culture=neutral, PublicKeyToken=3bd1f1ef638b0d3c, processorArchitecture=MSIL">
       <HintPath>packages\Chronic.Signed.0.3.2\lib\net40\Chronic.dll</HintPath>
       <Private>True</Private>
@@ -136,18 +139,21 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="Contracts\ICodewarsService.cs" />
+    <Compile Include="Contracts\IDatabaseService.cs" />
     <Compile Include="Contracts\IMessageService.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="MessagingModule.cs" />
     <Compile Include="Models\AuditMessageModel.cs" />
     <Compile Include="Models\CodewarsResponseModel.cs" />
     <Compile Include="Models\WeeklyRatingUserModel.cs" />
     <Compile Include="Models\WeekModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\CodewarsConnectionService.cs" />
-    <Compile Include="Services\DatabaseConnectionService.cs" />
+    <Compile Include="Services\CodewarsService.cs" />
+    <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\MessageService.cs" />
     <Compile Include="Models\UserModel.cs" />
   </ItemGroup>

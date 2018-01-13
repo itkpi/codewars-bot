@@ -1,6 +1,7 @@
 ﻿using Codewars_Bot.Contracts;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,35 +10,57 @@ namespace Codewars_Bot.Services
 {
 	public class MessageService : IMessageService
 	{
+		private IDatabaseService DatabaseService { get; set; }
+		private ICodewarsService CodewarsService { get; set; }
 
-		public async Task<string> MessageHandler(Activity activity)
+		public MessageService(ICodewarsService codewarsService, IDatabaseService databaseService)
 		{
-			var databaseConnectionService = new DatabaseConnectionService();
-			var requestContent = new
-			{
-				UserId = activity.From.Id,
-				UserName = activity.From.Name,
-				Message = activity.Text
-			};
+			DatabaseService = databaseService;
+			CodewarsService = codewarsService;
+		}
 
-			databaseConnectionService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
-
-			switch (activity.Text)
+		public async Task<string> ProcessMessage(Activity activity)
+		{
+			try
 			{
-				case "/weekly_rating":
-					return GetWeeklyRating();
-				case "/total_rating":
-					return GetGeneralRating();
-				case "/weekly_rating_channel":
-					return GetWeeklyRatingForChannel();
-				case "/start":
-					return ShowFaq();
-				case "/show_faq":
-					return ShowFaq();
-				default:
-					return await SaveNewUser(activity);
+				var reply = String.Empty;
+				var requestContent = new
+				{
+					UserId = activity.From.Id,
+					UserName = activity.From.Name,
+					Message = activity.Text
+				};
+
+				DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
+
+				switch (activity.Text)
+				{
+					case "/weekly_rating":
+						reply = DatabaseService.GetWeeklyRating();
+						break;
+					case "/total_rating":
+						reply = DatabaseService.GetTotalRating();
+						break;
+					case "/weekly_rating_channel":
+						reply = GetWeeklyRatingForChannel();
+						break;
+					case "/start":
+					case "/show_faq":
+						reply = ShowFaq();
+						break;
+					default:
+						reply = await SaveNewUser(activity);
+						break;
+				}
+
+				DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(reply));
+				return reply;
 			}
-
+			catch (Exception ex)
+			{
+				DatabaseService.AuditMessageInDatabase($"ERROR: {ex.Message} {ex.StackTrace}");
+				return String.Empty;
+			}
 		}
 
 		private async Task<string> SaveNewUser(Activity activity)
@@ -45,8 +68,6 @@ namespace Codewars_Bot.Services
 			if ((bool)activity.Conversation.IsGroup)
 				return string.Empty;
 
-			var databaseConnectionService = new DatabaseConnectionService();
-			var codewarsConnectionService = new CodewarsConnectionService();
 			var regex = new Regex(@"^\w+$", RegexOptions.IgnoreCase);
 
 			if (!regex.Match(activity.Text).Success)
@@ -56,7 +77,7 @@ namespace Codewars_Bot.Services
 					<br/><br/>Певні, що це таки ваш нік? Пишіть йому: @maksim36ua";
 			}
 
-			var userFromDb = databaseConnectionService.GetUserById(int.Parse(activity.From.Id));
+			var userFromDb = DatabaseService.GetUserById(int.Parse(activity.From.Id));
 
 			if (userFromDb != null)
 				return $"Ви вже зареєстровані в рейтингу Codewars під ніком {userFromDb.CodewarsUsername}";
@@ -68,7 +89,7 @@ namespace Codewars_Bot.Services
 				TelegramId = int.Parse(activity.From.Id)
 			};
 
-			var codewarsUser = await codewarsConnectionService.GetCodewarsUser(user.CodewarsUsername);
+			var codewarsUser = await CodewarsService.GetCodewarsUser(user.CodewarsUsername);
 
 			if (codewarsUser == null)
 			{
@@ -80,25 +101,12 @@ namespace Codewars_Bot.Services
 				user.Points = codewarsUser.Honor;
 			}
 
-			return databaseConnectionService.SaveUserToDatabase(user);
-		}
-
-		private string GetWeeklyRating()
-		{
-			var databaseConnectionService = new DatabaseConnectionService();
-			return databaseConnectionService.GetWeeklyRating();
-		}
-
-		private string GetGeneralRating()
-		{
-			var databaseConnectionService = new DatabaseConnectionService();
-			return databaseConnectionService.GetGeneralRating();
+			return DatabaseService.SaveUserToDatabase(user);
 		}
 
 		private string GetWeeklyRatingForChannel()
 		{
-			var databaseConnectionService = new DatabaseConnectionService();
-			var rating = databaseConnectionService.GetWeeklyRating();
+			var rating = DatabaseService.GetWeeklyRating();
 
 			return rating + @"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
 					<br/><br/>Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua";

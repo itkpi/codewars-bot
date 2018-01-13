@@ -1,4 +1,5 @@
-﻿using Codewars_Bot.Models;
+﻿using Codewars_Bot.Contracts;
+using Codewars_Bot.Models;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -7,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace Codewars_Bot.Services
 {
-    public class CodewarsConnectionService
+    public class CodewarsService : ICodewarsService
     {
         public async Task<CodewarsResponseModel> GetCodewarsUser(string username)
         {
-
 			using (var httpClient = new HttpClient())
             {
                 httpClient.BaseAddress = new Uri ($"https://www.codewars.com/api/v1/users/");

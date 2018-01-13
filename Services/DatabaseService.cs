@@ -1,4 +1,5 @@
-﻿using Codewars_Bot.Models;
+﻿using Codewars_Bot.Contracts;
+using Codewars_Bot.Models;
 using Dapper;
 using System;
 using System.Collections.Generic;
@@ -8,20 +9,15 @@ using System.Text;
 
 namespace Codewars_Bot.Services
 {
-	public class DatabaseConnectionService
+	public class DatabaseService : IDatabaseService
 	{
 		public void AuditMessageInDatabase(string message)
 		{
-			var messageModel = new AuditMessageModel
-			{
-				Message = message
-			};
 			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
 			{
 				var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
-				connection.Query(query, messageModel);
+				connection.Query(query, new AuditMessageModel{Message = message});
 			}
-
 		}
 
 		public string GetWeeklyRating()
@@ -77,7 +73,7 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		public string GetGeneralRating()
+		public string GetTotalRating()
 		{
 			try
 			{
