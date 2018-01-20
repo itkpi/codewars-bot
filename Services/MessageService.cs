@@ -41,6 +41,9 @@ namespace Codewars_Bot.Services
 					case "/total_rating":
 						reply = DatabaseService.GetTotalRating();
 						break;
+					case "/my_weekly_points":
+						reply = GetWeeklyPoints(activity);
+						break;
 					case "/weekly_rating_channel":
 						reply = GetWeeklyRatingForChannel();
 						break;
@@ -102,6 +105,11 @@ namespace Codewars_Bot.Services
 			}
 
 			return DatabaseService.SaveUserToDatabase(user);
+		}
+
+		private string GetWeeklyPoints(Activity activity)
+		{
+			return DatabaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
 		}
 
 		private string GetWeeklyRatingForChannel()

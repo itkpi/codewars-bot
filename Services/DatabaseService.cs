@@ -16,7 +16,7 @@ namespace Codewars_Bot.Services
 			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
 			{
 				var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
-				connection.Query(query, new AuditMessageModel{Message = message});
+				connection.Query(query, new AuditMessageModel { Message = message });
 			}
 		}
 
@@ -100,6 +100,36 @@ namespace Codewars_Bot.Services
 			}
 		}
 
+		public string GetWeeklyPoints(int userId)
+		{
+			try
+			{
+				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				{
+					StringBuilder response = new StringBuilder();
+					string query = $@"SELECT w.[WeekNumber], [EndDate], wrum.[Points] 
+						FROM [Rating].[WeeklyRatingUserModel] wrum
+						JOIN [Rating].[Weeks] w on w.WeekNumber = wrum.WeekNumber
+						JOIN [User].[Users] u on wrum.CodewarsUsername = u.CodewarsUsername
+						WHERE u.TelegramId = {userId}";
+							
+					var weeklyPoints = connection.Query<WeeklyPointsModel>(query).ToList();
+
+					foreach (var week in weeklyPoints.OrderBy(q => q.WeekNumber))
+					{
+						response.Append($"<br/>Week {week.WeekNumber} ({week.EndDate.ToString("dd.MM.yyyy")}): **{week.Points}**");
+					}
+
+					return response.ToString();
+				}
+			}
+			catch (Exception ex)
+			{
+				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
+				return $"Не вдалось дістати бали по тижням: {ex.Message}";
+			}
+		}
+
 		public string SaveUserToDatabase(UserModel user)
 		{
 			try
@@ -118,11 +148,11 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		public UserModel GetUserById(int id)
+		public UserModel GetUserById(int userId)
 		{
 			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
 			{
-				string query = $"SELECT * FROM [User].[Users] WHERE TelegramId = {id}";
+				string query = $"SELECT * FROM [User].[Users] WHERE TelegramId = {userId}";
 				return connection.QueryFirstOrDefault<UserModel>(query);
 			}
 		}

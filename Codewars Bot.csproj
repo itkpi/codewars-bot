@@ -150,6 +150,7 @@
     <Compile Include="MessagingModule.cs" />
     <Compile Include="Models\AuditMessageModel.cs" />
     <Compile Include="Models\CodewarsResponseModel.cs" />
+    <Compile Include="Models\WeeklyPointsModel.cs" />
     <Compile Include="Models\WeeklyRatingUserModel.cs" />
     <Compile Include="Models\WeekModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
