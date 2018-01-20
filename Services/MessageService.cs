@@ -44,6 +44,9 @@ namespace Codewars_Bot.Services
 					case "/my_weekly_points":
 						reply = GetWeeklyPoints(activity);
 						break;
+					case "/delete_userinfo":
+						reply = DeleteUserInfo(activity);
+						break;
 					case "/weekly_rating_channel":
 						reply = GetWeeklyRatingForChannel();
 						break;
@@ -112,6 +115,11 @@ namespace Codewars_Bot.Services
 			return DatabaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
 		}
 
+		private string DeleteUserInfo(Activity activity)
+		{
+			return DatabaseService.DeleteUserInfo(int.Parse(activity.From.Id));
+		}
+
 		private string GetWeeklyRatingForChannel()
 		{
 			var rating = DatabaseService.GetWeeklyRating();
@@ -132,6 +140,8 @@ namespace Codewars_Bot.Services
 				<br/>1) /weekly_rating показує поточний рейтинг за цей тиждень. 
 				<br/>2) /total_rating відображає загальну кількість балів в кожного користувача.
 				<br/>3) /my_weekly_points відображає історію з кількістю балів в кінці кожного тижня.
+				<br/>4) /delete_userinfo для того, щоб покинути рейтинг.
+			<br/><br/>Якщо ви поміняли логін в ТГ і/або логін Codewars -- просто застосуйте команду /delete_userinfo і зареєструйтесь повторно. Дані рейтингу буде збережено.
 			<br/><br/>Запрошуйте друзів в клан і гайда рубитись!
 			<br/><br/>P.S: якщо знайшли багу або маєте зауваження -- пишіть йому @maksim36ua";
 		}

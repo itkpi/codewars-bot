@@ -130,6 +130,25 @@ namespace Codewars_Bot.Services
 			}
 		}
 
+		public string DeleteUserInfo(int userId)
+		{
+			try
+			{
+				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				{
+					string query = $@"DELETE FROM [User].[Users] WHERE TelegramId = {userId}";
+
+					connection.Query(query);
+					return "Видалення пройшло успішно";
+				}
+			}
+			catch (Exception ex)
+			{
+				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
+				return $"Не вдалось видалити дані: {ex.Message}";
+			}
+		}
+
 		public string SaveUserToDatabase(UserModel user)
 		{
 			try

@@ -12,6 +12,7 @@ namespace Codewars_Bot.Contracts
 		string GetWeeklyRating();
 		string GetTotalRating();
 		string GetWeeklyPoints(int userId);
+		string DeleteUserInfo(int userId);
 		string SaveUserToDatabase(UserModel user);
 		UserModel GetUserById(int userId);
 	}
