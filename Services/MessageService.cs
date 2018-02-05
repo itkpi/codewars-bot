@@ -74,7 +74,7 @@ namespace Codewars_Bot.Services
 			if ((bool)activity.Conversation.IsGroup)
 				return string.Empty;
 
-			var regex = new Regex(@"^\w+$", RegexOptions.IgnoreCase);
+			var regex = new Regex(@"^[a-zA-Z0-9\s_.-]+$", RegexOptions.IgnoreCase);
 
 			if (!regex.Match(activity.Text).Success)
 			{
