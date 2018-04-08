@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Codewars_Bot.Contracts
 {
 	public interface IDatabaseService
 	{
 		void AuditMessageInDatabase(string message);
-		List<string> GetWeeklyRating();
+		List<string> GetWeeklyRating(int? numberOfUsersToDisplay = null);
 		List<string> GetTotalRating();
 		List<string> GetWeeklyPoints(int userId);
 		string DeleteUserInfo(int userId);

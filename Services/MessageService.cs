@@ -3,6 +3,7 @@ using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -124,8 +125,8 @@ namespace Codewars_Bot.Services
 
 		private List<string> GetWeeklyRatingForChannel()
 		{
-			var rating = DatabaseService.GetWeeklyRating();
-			rating.Add($@"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
+			var rating = DatabaseService.GetWeeklyRating(50);
+			string.Concat(rating.First(), $@"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
 					<br/><br/>Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
 
 			return rating;

@@ -20,7 +20,7 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		public List<string> GetWeeklyRating()
+		public List<string> GetWeeklyRating(int? numberOfUsersToDisplay = null)
 		{
 			try
 			{
@@ -55,11 +55,16 @@ namespace Codewars_Bot.Services
 					currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
 
 					var responseList = new List<string>();
-					StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars. Тиждень {previousWeek.WeekNumber}**<br/>");
+					StringBuilder response = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {previousWeek.WeekNumber}**
+															<br/>**Загальна кількість учасників: {currentWeekUsersRating.Count}**<br/>");
 
 					foreach (var user in currentWeekUsersRating)
 					{
 						response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user)+1));
+
+						if (numberOfUsersToDisplay != null && currentWeekUsersRating.IndexOf(user) + 1 == numberOfUsersToDisplay.Value)
+							break;
+
 						if ((currentWeekUsersRating.IndexOf(user) + 1) % 100 == 0)
 						{
 							responseList.Add(response.ToString());
