@@ -2,6 +2,7 @@
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,11 +20,11 @@ namespace Codewars_Bot.Services
 			CodewarsService = codewarsService;
 		}
 
-		public async Task<string> ProcessMessage(Activity activity)
+		public async Task<List<string>> ProcessMessage(Activity activity)
 		{
 			try
 			{
-				var reply = String.Empty;
+				var reply = new List<string>();
 				var requestContent = new
 				{
 					UserId = activity.From.Id,
@@ -45,17 +46,18 @@ namespace Codewars_Bot.Services
 						reply = GetWeeklyPoints(activity);
 						break;
 					case "/delete_userinfo":
-						reply = DeleteUserInfo(activity);
+						reply.Add(DeleteUserInfo(activity));
 						break;
 					case "/weekly_rating_channel":
 						reply = GetWeeklyRatingForChannel();
 						break;
 					case "/start":
 					case "/show_faq":
-						reply = ShowFaq();
+						reply.Add(ShowFaq());
 						break;
 					default:
-						reply = await SaveNewUser(activity);
+						var userResponse = await SaveNewUser(activity);
+						reply.Add(userResponse);
 						break;
 				}
 
@@ -65,7 +67,7 @@ namespace Codewars_Bot.Services
 			catch (Exception ex)
 			{
 				DatabaseService.AuditMessageInDatabase($"ERROR: {ex.Message} {ex.StackTrace}");
-				return String.Empty;
+				return new List<string>();
 			}
 		}
 
@@ -110,7 +112,7 @@ namespace Codewars_Bot.Services
 			return DatabaseService.SaveUserToDatabase(user);
 		}
 
-		private string GetWeeklyPoints(Activity activity)
+		private List<string> GetWeeklyPoints(Activity activity)
 		{
 			return DatabaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
 		}
@@ -120,12 +122,13 @@ namespace Codewars_Bot.Services
 			return DatabaseService.DeleteUserInfo(int.Parse(activity.From.Id));
 		}
 
-		private string GetWeeklyRatingForChannel()
+		private List<string> GetWeeklyRatingForChannel()
 		{
 			var rating = DatabaseService.GetWeeklyRating();
+			rating.Add($@"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
+					<br/><br/>Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
 
-			return rating + @"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
-					<br/><br/>Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua";
+			return rating;
 		}
 
 		private string ShowFaq()

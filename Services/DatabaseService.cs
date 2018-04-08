@@ -20,7 +20,7 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		public string GetWeeklyRating()
+		public List<string> GetWeeklyRating()
 		{
 			try
 			{
@@ -31,8 +31,6 @@ namespace Codewars_Bot.Services
 
 					var getUsersRatingQuery = $"SELECT * FROM [Rating].[WeeklyRatingUserModel] WHERE WeekNumber = {previousWeek.WeekNumber}";
 					var usersWithRating = connection.Query<WeeklyRatingUserModel>(getUsersRatingQuery).ToList();
-
-					StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars. Тиждень {previousWeek.WeekNumber}**<br/>");
 
 					string query = "SELECT * FROM [User].[Users]";
 					var users = connection.Query<UserModel>(query).ToList();
@@ -54,26 +52,33 @@ namespace Codewars_Bot.Services
 						currentWeekUsersRating.Add(newUser);
 					}
 
-					currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(q => q.Points).ToList();
-					var position = 1;
+					currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
+
+					var responseList = new List<string>();
+					StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars. Тиждень {previousWeek.WeekNumber}**<br/>");
 
 					foreach (var user in currentWeekUsersRating)
 					{
-						response.Append(FormatUserRatingString(user, position));
-						position++;
+						response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user)+1));
+						if ((currentWeekUsersRating.IndexOf(user) + 1) % 100 == 0)
+						{
+							responseList.Add(response.ToString());
+							response.Clear();
+						}
 					}
+					responseList.Add(response.ToString());
 
-					return response.ToString();
+					return responseList;
 				}
 			}
 			catch (Exception ex)
 			{
 				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
-				return $"Не вдалось дістати рейтинг за тиждень";
+				return new List<string>();
 			}
 		}
 
-		public string GetTotalRating()
+		public List<string> GetTotalRating()
 		{
 			try
 			{
@@ -81,52 +86,66 @@ namespace Codewars_Bot.Services
 				{
 					string query = "SELECT * FROM [User].[Users]";
 					var users = connection.Query<UserModel>(query).ToList();
+					var responseList = new List<string>();
+
 					StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars**<br/>");
-					var position = 1;
 
-					foreach (var user in users.OrderByDescending(q => q.Points))
+					var totalUsersRating = users.OrderByDescending(q => q.Points).ToList();
+					foreach (var user in totalUsersRating)
 					{
-						response.Append(FormatUserRatingString(user, position));
-						position++;
+						response.Append(FormatUserRatingString(user, totalUsersRating.IndexOf(user) + 1));
+						if ((totalUsersRating.IndexOf(user) + 1) % 100 == 0)
+						{
+							responseList.Add(response.ToString());
+							response.Clear();
+						}
 					}
-
-					return response.ToString();
+					responseList.Add(response.ToString());
+					return responseList;
 				}
 			}
 			catch (Exception ex)
 			{
 				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
-				return $"Не вдалось дістати загальний рейтинг";
+				return new List<string>();
 			}
 		}
 
-		public string GetWeeklyPoints(int userId)
+		public List<string> GetWeeklyPoints(int userId)
 		{
 			try
 			{
 				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
 				{
 					StringBuilder response = new StringBuilder();
+					var responseList = new List<string>();
+
 					string query = $@"SELECT w.[WeekNumber], [EndDate], wrum.[Points] 
 						FROM [Rating].[WeeklyRatingUserModel] wrum
 						JOIN [Rating].[Weeks] w on w.WeekNumber = wrum.WeekNumber
 						JOIN [User].[Users] u on wrum.CodewarsUsername = u.CodewarsUsername
 						WHERE u.TelegramId = {userId}";
 							
-					var weeklyPoints = connection.Query<WeeklyPointsModel>(query).ToList();
+					var weeklyPoints = connection.Query<WeeklyPointsModel>(query).OrderBy(q => q.WeekNumber).ToList();
 
-					foreach (var week in weeklyPoints.OrderBy(q => q.WeekNumber))
+					foreach (var week in weeklyPoints)
 					{
 						response.Append($"<br/>Week {week.WeekNumber} ({week.EndDate.ToString("dd.MM.yyyy")}): **{week.Points}**");
+						if ((weeklyPoints.IndexOf(week) + 1) % 100 == 0)
+						{
+							responseList.Add(response.ToString());
+							response.Clear();
+						}
 					}
+					responseList.Add(response.ToString());
 
-					return response.ToString();
+					return responseList;
 				}
 			}
 			catch (Exception ex)
 			{
 				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
-				return $"Не вдалось дістати бали по тижням: {ex.Message}";
+				return new List<string>();
 			}
 		}
 
@@ -188,5 +207,9 @@ namespace Codewars_Bot.Services
 
 			return $"{position}) {telegramLogin} {codewarsLogin} <br/>";
 		}
+
+		//private List<string> SplitResponseMessage() { 
+
+		//}
 	}
 }

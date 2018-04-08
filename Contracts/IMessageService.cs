@@ -9,6 +9,6 @@ namespace Codewars_Bot.Contracts
 {
 	public interface IMessageService
 	{
-		Task<string> ProcessMessage(Activity activity);
+		Task<List<string>> ProcessMessage(Activity activity);
 	}
 }

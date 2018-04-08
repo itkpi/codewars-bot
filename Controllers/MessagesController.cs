@@ -4,8 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
-using Codewars_Bot.Services;
 using Codewars_Bot.Contracts;
 
 namespace Codewars_Bot
@@ -14,10 +12,12 @@ namespace Codewars_Bot
 	public class MessagesController : ApiController
 	{
 		private IMessageService MessageService { get; set; }
+		private IDatabaseService DatabaseService { get; set; }
 
-		public MessagesController(IMessageService messageService)
+		public MessagesController(IMessageService messageService, IDatabaseService databaseService)
 		{
 			MessageService = messageService;
+			DatabaseService = databaseService;
 		}
 
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
@@ -27,13 +27,22 @@ namespace Codewars_Bot
 			{
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-				var responseMessage = await MessageService.ProcessMessage(activity);
+				var responseMessages = await MessageService.ProcessMessage(activity);
 
-				if (!string.IsNullOrEmpty(responseMessage))
+				try
 				{
-					Activity reply = activity.CreateReply($"{responseMessage}");
-					reply.ReplyToId = new Guid().ToString();
-					await connector.Conversations.ReplyToActivityAsync(reply);
+					if (responseMessages.Count != 0)
+					{
+						foreach (var message in responseMessages) { 
+							Activity reply = activity.CreateReply($"{message}");
+							reply.ReplyToId = new Guid().ToString();
+							connector.Conversations.ReplyToActivity(reply);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					DatabaseService.AuditMessageInDatabase($"EXCEPTION: {ex.Message} {ex.StackTrace}");
 				}
 			}
 			else
