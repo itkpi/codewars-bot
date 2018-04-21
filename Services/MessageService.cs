@@ -125,11 +125,9 @@ namespace Codewars_Bot.Services
 
 		private List<string> GetWeeklyRatingForChannel()
 		{
-			var rating = DatabaseService.GetWeeklyRating(50);
-			string.Concat(rating.First(), $@"<br/><br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. 
-					<br/><br/>Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
+			var rating = string.Concat(DatabaseService.GetWeeklyRating(50).First(), $@"<br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Запрошуйте друзів і гайда рубитись! Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
 
-			return rating;
+			return new List<string> { rating };
 		}
 
 		private string ShowFaq()
