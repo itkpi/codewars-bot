@@ -5,12 +5,12 @@ namespace Codewars_Bot.Contracts
 {
 	public interface IDatabaseService
 	{
-	    WeekModel GetLastWeek();
-        List<UserModel> GetWeeklyRating(WeekModel week);
+		WeekModel GetLastWeek();
+		List<UserModel> GetWeeklyRating(WeekModel week);
 		List<UserModel> GetTotalRating();
 		List<WeeklyPointsModel> GetWeeklyPoints(int userId);
 		bool DeleteUserInfo(int userId);
-	    bool SaveUserToDatabase(UserModel user);
+		bool SaveUserToDatabase(UserModel user);
 		UserModel GetUserById(int userId);
 	}
 }

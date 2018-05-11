@@ -13,14 +13,14 @@ namespace Codewars_Bot.Services
 {
 	public class MessageService : IMessageService
 	{
-	    private readonly ILog _log;
-	    private readonly IDatabaseService _databaseService;
-	    private readonly ICodewarsService _codewarsService;
+		private readonly ILog _log;
+		private readonly IDatabaseService _databaseService;
+		private readonly ICodewarsService _codewarsService;
 
 		public MessageService(ICodewarsService codewarsService, IDatabaseService databaseService, ILog log)
 		{
-		    _log = log;
-		    _databaseService = databaseService;
+			_log = log;
+			_databaseService = databaseService;
 			_codewarsService = codewarsService;
 		}
 
@@ -28,7 +28,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-			    List<string> reply;
+				List<string> reply;
 				var requestContent = new
 				{
 					UserId = activity.From.Id,
@@ -75,57 +75,57 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-	    private List<string> GetWeeklyRating()
-	    {
-	        var week = _databaseService.GetLastWeek();
+		private List<string> GetWeeklyRating()
+		{
+			var week = _databaseService.GetLastWeek();
 
-            if(week == null)
-                return new List<string>();
+			if (week == null)
+				return new List<string>();
 
-	        var currentWeekUsersRating = _databaseService.GetWeeklyRating(week);
-            currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
+			var currentWeekUsersRating = _databaseService.GetWeeklyRating(week);
+			currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
 
-	        var responseList = new List<string>();
-	        StringBuilder response = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {week.WeekNumber}**
+			var responseList = new List<string>();
+			StringBuilder response = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {week.WeekNumber}**
 															<br/>**Загальна кількість учасників: {currentWeekUsersRating.Count}**<br/>");
 
-	        foreach (var user in currentWeekUsersRating)
-	        {
-	            response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user) + 1));
+			foreach (var user in currentWeekUsersRating)
+			{
+				response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user) + 1));
 
-	            if ((currentWeekUsersRating.IndexOf(user) + 1) % 100 == 0)
-	            {
-	                responseList.Add(response.ToString());
-	                response.Clear();
-	            }
-	        }
-	        responseList.Add(response.ToString());
+				if ((currentWeekUsersRating.IndexOf(user) + 1) % 100 == 0)
+				{
+					responseList.Add(response.ToString());
+					response.Clear();
+				}
+			}
+			responseList.Add(response.ToString());
 
-	        return responseList;
-        }
+			return responseList;
+		}
 
-	    private List<string> GetTotalRating()
-	    {
-	        var users = _databaseService.GetTotalRating();
-            var responseList = new List<string>();
+		private List<string> GetTotalRating()
+		{
+			var users = _databaseService.GetTotalRating();
+			var responseList = new List<string>();
 
-	        StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars**<br/>");
+			StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars**<br/>");
 
-	        var totalUsersRating = users.OrderByDescending(q => q.Points).ToList();
-	        foreach (var user in totalUsersRating)
-	        {
-	            response.Append(FormatUserRatingString(user, totalUsersRating.IndexOf(user) + 1));
-	            if ((totalUsersRating.IndexOf(user) + 1) % 100 == 0)
-	            {
-	                responseList.Add(response.ToString());
-	                response.Clear();
-	            }
-	        }
-	        responseList.Add(response.ToString());
-	        return responseList;
-	    }
+			var totalUsersRating = users.OrderByDescending(q => q.Points).ToList();
+			foreach (var user in totalUsersRating)
+			{
+				response.Append(FormatUserRatingString(user, totalUsersRating.IndexOf(user) + 1));
+				if ((totalUsersRating.IndexOf(user) + 1) % 100 == 0)
+				{
+					responseList.Add(response.ToString());
+					response.Clear();
+				}
+			}
+			responseList.Add(response.ToString());
+			return responseList;
+		}
 
-	    private async Task<string> SaveNewUser(Activity activity)
+		private async Task<string> SaveNewUser(Activity activity)
 		{
 			if (activity.Conversation.IsGroup.GetValueOrDefault())
 				return string.Empty;
@@ -158,84 +158,84 @@ namespace Codewars_Bot.Services
 				return $"Користувач {user.CodewarsUsername} не зареєстрований на Codewars";
 			}
 
-		    user.CodewarsFullname = codewarsUser.Name;
-		    user.Points = codewarsUser.Honor;
+			user.CodewarsFullname = codewarsUser.Name;
+			user.Points = codewarsUser.Honor;
 
-		    if (_databaseService.SaveUserToDatabase(user))
-		        return "Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
+			if (_databaseService.SaveUserToDatabase(user))
+				return "Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
 
-		    return "Не вдалось створити користувача";
+			return "Не вдалось створити користувача";
 		}
 
 		private List<string> GetWeeklyPoints(Activity activity)
 		{
-            var weeklyPoints = _databaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
-            StringBuilder response = new StringBuilder();
-            List<string> responseList = new List<string>();
-            foreach (var week in weeklyPoints)
-		    {
-		        response.Append($"<br/>Week {week.WeekNumber} ({week.EndDate:dd.MM.yyyy}): **{week.Points}**");
-		        if ((weeklyPoints.IndexOf(week) + 1) % 100 == 0)
-		        {
-		            responseList.Add(response.ToString());
-		            response.Clear();
-		        }
-		    }
-		    responseList.Add(response.ToString());
+			var weeklyPoints = _databaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
+			StringBuilder response = new StringBuilder();
+			List<string> responseList = new List<string>();
+			foreach (var week in weeklyPoints)
+			{
+				response.Append($"<br/>Week {week.WeekNumber} ({week.EndDate:dd.MM.yyyy}): **{week.Points}**");
+				if ((weeklyPoints.IndexOf(week) + 1) % 100 == 0)
+				{
+					responseList.Add(response.ToString());
+					response.Clear();
+				}
+			}
+			responseList.Add(response.ToString());
 
-		    return responseList;
+			return responseList;
 		}
 
 		private List<string> DeleteUserInfo(Activity activity)
 		{
-		    if (_databaseService.DeleteUserInfo(int.Parse(activity.From.Id)))
-		        return new List<string>{"Видалення пройшло успішно"};
+			if (_databaseService.DeleteUserInfo(int.Parse(activity.From.Id)))
+				return new List<string> { "Видалення пройшло успішно" };
 
-		    return new List<string>{"Не вдалось видалити дані"};
+			return new List<string> { "Не вдалось видалити дані" };
 		}
 
 		private List<string> GetWeeklyRatingForChannel()
 		{
-		    var numberOfUsersToDisplay = 50;
-		    var week = _databaseService.GetLastWeek();
+			var numberOfUsersToDisplay = 50;
+			var week = _databaseService.GetLastWeek();
 
-		    if (week == null)
-		        return new List<string>();
+			if (week == null)
+				return new List<string>();
 
-            var currentWeekUsersRating = _databaseService.GetWeeklyRating(week);
+			var currentWeekUsersRating = _databaseService.GetWeeklyRating(week);
 
-            currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
+			currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
 
-		    StringBuilder response  = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {week.WeekNumber}**
+			StringBuilder response = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {week.WeekNumber}**
 															<br/>**Загальна кількість учасників: {currentWeekUsersRating.Count}**<br/>");
 
-		    foreach (var user in currentWeekUsersRating)
-		    {
-		        response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user) + 1));
+			foreach (var user in currentWeekUsersRating)
+			{
+				response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user) + 1));
 
-		        if (currentWeekUsersRating.IndexOf(user) + 1 == numberOfUsersToDisplay)
-		            break;
-		    }
+				if (currentWeekUsersRating.IndexOf(user) + 1 == numberOfUsersToDisplay)
+					break;
+			}
 
-		    var rating = string.Concat(response.ToString(), $@"<br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Запрошуйте друзів і гайда рубитись! Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
+			var rating = string.Concat(response.ToString(), $@"<br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Запрошуйте друзів і гайда рубитись! Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
 
-            return new List<string> { rating };
-        }
+			return new List<string> { rating };
+		}
 
-	    private string FormatUserRatingString(UserModel user, int position)
-	    {
-	        var telegramLogin = user.TelegramUsername != null
-	            ? $"@{user.TelegramUsername}"
-	            : "";
+		private string FormatUserRatingString(UserModel user, int position)
+		{
+			var telegramLogin = user.TelegramUsername != null
+				? $"@{user.TelegramUsername}"
+				: "";
 
-	        var codewarsLogin = position <= 10
-	            ? $"**({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}**"
-	            : $"({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}";
+			var codewarsLogin = position <= 10
+				? $"**({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}**"
+				: $"({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}";
 
-	        return $"{position}) {telegramLogin} {codewarsLogin} <br/>";
-	    }
+			return $"{position}) {telegramLogin} {codewarsLogin} <br/>";
+		}
 
-        private string ShowFaq()
+		private string ShowFaq()
 		{
 			return @"Вітаємо в клані ІТ КРІ на Codewars! 
 			<br/><br/>https://codewars.com -- це знаменитий сайт з задачами для програмістів, за розв'язок яких нараховуються бали.

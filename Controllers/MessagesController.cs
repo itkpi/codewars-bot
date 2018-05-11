@@ -12,13 +12,13 @@ namespace Codewars_Bot
 	[BotAuthentication]
 	public class MessagesController : ApiController
 	{
-	    private readonly ILog _log;
-	    private readonly IMessageService _messageService;
+		private readonly ILog _log;
+		private readonly IMessageService _messageService;
 
 		public MessagesController(IMessageService messageService, ILog log)
 		{
-		    _log = log;
-		    _messageService = messageService;
+			_log = log;
+			_messageService = messageService;
 		}
 
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
@@ -33,7 +33,8 @@ namespace Codewars_Bot
 				{
 					if (responseMessages.Count != 0)
 					{
-						foreach (var message in responseMessages) { 
+						foreach (var message in responseMessages)
+						{
 							Activity reply = activity.CreateReply($"{message}");
 							reply.ReplyToId = new Guid().ToString();
 							connector.Conversations.ReplyToActivity(reply);

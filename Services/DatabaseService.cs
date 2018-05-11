@@ -12,29 +12,29 @@ namespace Codewars_Bot.Services
 {
 	public class DatabaseService : IDatabaseService
 	{
-	    private readonly ILog _log;
+		private readonly ILog _log;
 
-	    public DatabaseService(ILog log)
-	    {
-	        _log = log;
-	    }
+		public DatabaseService(ILog log)
+		{
+			_log = log;
+		}
 
-	    public WeekModel GetLastWeek()
-	    {
-	        try
-	        {
-	            using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
-	            {
-	                var getWeekQuery = $"SELECT TOP 1 * FROM [Rating].[Weeks] ORDER BY WeekNumber DESC";
-	                return connection.Query<WeekModel>(getWeekQuery).First();
-	            }
-	        }
-	        catch (Exception ex)
-	        {
-	            _log.Error(ex);
-	            return null;
-	        }
-	    }
+		public WeekModel GetLastWeek()
+		{
+			try
+			{
+				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				{
+					var getWeekQuery = $"SELECT TOP 1 * FROM [Rating].[Weeks] ORDER BY WeekNumber DESC";
+					return connection.Query<WeekModel>(getWeekQuery).First();
+				}
+			}
+			catch (Exception ex)
+			{
+				_log.Error(ex);
+				return null;
+			}
+		}
 
 		public List<UserModel> GetWeeklyRating(WeekModel week)
 		{
@@ -65,7 +65,7 @@ namespace Codewars_Bot.Services
 						currentWeekUsersRating.Add(newUser);
 					}
 
-				    return currentWeekUsersRating;
+					return currentWeekUsersRating;
 				}
 			}
 			catch (Exception ex)
@@ -87,7 +87,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-                _log.Error(ex);
+				_log.Error(ex);
 				return new List<UserModel>();
 			}
 		}
@@ -103,7 +103,7 @@ namespace Codewars_Bot.Services
 						JOIN [Rating].[Weeks] w on w.WeekNumber = wrum.WeekNumber
 						JOIN [User].[Users] u on wrum.CodewarsUsername = u.CodewarsUsername
 						WHERE u.TelegramId = {userId}";
-							
+
 					return connection.Query<WeeklyPointsModel>(query).OrderBy(q => q.WeekNumber).ToList();
 				}
 			}
@@ -128,7 +128,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-			    _log.Error(ex.Message);
+				_log.Error(ex.Message);
 				return false;
 			}
 		}
