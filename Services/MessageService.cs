@@ -28,7 +28,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-				var reply = new List<string>();
+			    List<string> reply;
 				var requestContent = new
 				{
 					UserId = activity.From.Id,
@@ -41,27 +41,27 @@ namespace Codewars_Bot.Services
 				switch (activity.Text)
 				{
 					case "/weekly_rating":
-						reply = _databaseService.GetWeeklyRating();
+						reply = GetWeeklyRating();
 						break;
 					case "/total_rating":
-						reply = _databaseService.GetTotalRating();
+						reply = GetTotalRating();
 						break;
 					case "/my_weekly_points":
 						reply = GetWeeklyPoints(activity);
 						break;
 					case "/delete_userinfo":
-						reply.Add(DeleteUserInfo(activity));
+						reply = DeleteUserInfo(activity);
 						break;
 					case "/weekly_rating_channel":
 						reply = GetWeeklyRatingForChannel();
 						break;
 					case "/start":
 					case "/show_faq":
-						reply.Add(ShowFaq());
+						reply = new List<string> { ShowFaq() };
 						break;
 					default:
 						var userResponse = await SaveNewUser(activity);
-						reply.Add(userResponse);
+						reply = new List<string> { userResponse };
 						break;
 				}
 
@@ -75,9 +75,59 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		private async Task<string> SaveNewUser(Activity activity)
+	    private List<string> GetWeeklyRating()
+	    {
+	        var week = _databaseService.GetLastWeek();
+
+            if(week == null)
+                return new List<string>();
+
+	        var currentWeekUsersRating = _databaseService.GetWeeklyRating(week);
+            currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
+
+	        var responseList = new List<string>();
+	        StringBuilder response = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {week.WeekNumber}**
+															<br/>**Загальна кількість учасників: {currentWeekUsersRating.Count}**<br/>");
+
+	        foreach (var user in currentWeekUsersRating)
+	        {
+	            response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user) + 1));
+
+	            if ((currentWeekUsersRating.IndexOf(user) + 1) % 100 == 0)
+	            {
+	                responseList.Add(response.ToString());
+	                response.Clear();
+	            }
+	        }
+	        responseList.Add(response.ToString());
+
+	        return responseList;
+        }
+
+	    private List<string> GetTotalRating()
+	    {
+	        var users = _databaseService.GetTotalRating();
+            var responseList = new List<string>();
+
+	        StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars**<br/>");
+
+	        var totalUsersRating = users.OrderByDescending(q => q.Points).ToList();
+	        foreach (var user in totalUsersRating)
+	        {
+	            response.Append(FormatUserRatingString(user, totalUsersRating.IndexOf(user) + 1));
+	            if ((totalUsersRating.IndexOf(user) + 1) % 100 == 0)
+	            {
+	                responseList.Add(response.ToString());
+	                response.Clear();
+	            }
+	        }
+	        responseList.Add(response.ToString());
+	        return responseList;
+	    }
+
+	    private async Task<string> SaveNewUser(Activity activity)
 		{
-			if ((bool)activity.Conversation.IsGroup)
+			if (activity.Conversation.IsGroup.GetValueOrDefault())
 				return string.Empty;
 
 			var regex = new Regex(@"^[a-zA-Z0-9\s_.-]+$", RegexOptions.IgnoreCase);
@@ -107,33 +157,85 @@ namespace Codewars_Bot.Services
 			{
 				return $"Користувач {user.CodewarsUsername} не зареєстрований на Codewars";
 			}
-			else
-			{
-				user.CodewarsFullname = codewarsUser.Name;
-				user.Points = codewarsUser.Honor;
-			}
 
-			return _databaseService.SaveUserToDatabase(user);
+		    user.CodewarsFullname = codewarsUser.Name;
+		    user.Points = codewarsUser.Honor;
+
+		    if (_databaseService.SaveUserToDatabase(user))
+		        return "Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
+
+		    return "Не вдалось створити користувача";
 		}
 
 		private List<string> GetWeeklyPoints(Activity activity)
 		{
-			return _databaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
+            var weeklyPoints = _databaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
+            StringBuilder response = new StringBuilder();
+            List<string> responseList = new List<string>();
+            foreach (var week in weeklyPoints)
+		    {
+		        response.Append($"<br/>Week {week.WeekNumber} ({week.EndDate:dd.MM.yyyy}): **{week.Points}**");
+		        if ((weeklyPoints.IndexOf(week) + 1) % 100 == 0)
+		        {
+		            responseList.Add(response.ToString());
+		            response.Clear();
+		        }
+		    }
+		    responseList.Add(response.ToString());
+
+		    return responseList;
 		}
 
-		private string DeleteUserInfo(Activity activity)
+		private List<string> DeleteUserInfo(Activity activity)
 		{
-			return _databaseService.DeleteUserInfo(int.Parse(activity.From.Id));
+		    if (_databaseService.DeleteUserInfo(int.Parse(activity.From.Id)))
+		        return new List<string>{"Видалення пройшло успішно"};
+
+		    return new List<string>{"Не вдалось видалити дані"};
 		}
 
 		private List<string> GetWeeklyRatingForChannel()
 		{
-			var rating = string.Concat(_databaseService.GetWeeklyRating(50).First(), $@"<br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Запрошуйте друзів і гайда рубитись! Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
+		    var numberOfUsersToDisplay = 50;
+		    var week = _databaseService.GetLastWeek();
 
-			return new List<string> { rating };
-		}
+		    if (week == null)
+		        return new List<string>();
 
-		private string ShowFaq()
+            var currentWeekUsersRating = _databaseService.GetWeeklyRating(week);
+
+            currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
+
+		    StringBuilder response  = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {week.WeekNumber}**
+															<br/>**Загальна кількість учасників: {currentWeekUsersRating.Count}**<br/>");
+
+		    foreach (var user in currentWeekUsersRating)
+		    {
+		        response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user) + 1));
+
+		        if (currentWeekUsersRating.IndexOf(user) + 1 == numberOfUsersToDisplay)
+		            break;
+		    }
+
+		    var rating = string.Concat(response.ToString(), $@"<br/>Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Запрошуйте друзів і гайда рубитись! Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
+
+            return new List<string> { rating };
+        }
+
+	    private string FormatUserRatingString(UserModel user, int position)
+	    {
+	        var telegramLogin = user.TelegramUsername != null
+	            ? $"@{user.TelegramUsername}"
+	            : "";
+
+	        var codewarsLogin = position <= 10
+	            ? $"**({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}**"
+	            : $"({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}";
+
+	        return $"{position}) {telegramLogin} {codewarsLogin} <br/>";
+	    }
+
+        private string ShowFaq()
 		{
 			return @"Вітаємо в клані ІТ КРІ на Codewars! 
 			<br/><br/>https://codewars.com -- це знаменитий сайт з задачами для програмістів, за розв'язок яких нараховуються бали.
