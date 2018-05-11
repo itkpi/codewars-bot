@@ -9,6 +9,6 @@ namespace Codewars_Bot.Logging
 	{
 		void Info(string message);
 		void Error(string message);
-		void Error(Exception exception, string message = "");
+		void Error(Exception exception, string message = null);
 	}
 }
