@@ -6,19 +6,18 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Codewars_Bot.Logging;
 
 namespace Codewars_Bot.Services
 {
 	public class DatabaseService : IDatabaseService
 	{
-		public void AuditMessageInDatabase(string message)
-		{
-			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
-			{
-				var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
-				connection.Query(query, new AuditMessageModel { Message = message });
-			}
-		}
+	    private readonly ILog _log;
+
+	    public DatabaseService(ILog log)
+	    {
+	        _log = log;
+	    }
 
 		public List<string> GetWeeklyRating(int? numberOfUsersToDisplay = null)
 		{
@@ -78,7 +77,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
+				_log.Error(ex);
 				return new List<string>();
 			}
 		}
@@ -111,7 +110,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
+                _log.Error(ex);
 				return new List<string>();
 			}
 		}
@@ -149,7 +148,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
+				_log.Error(ex.Message);
 				return new List<string>();
 			}
 		}
@@ -168,7 +167,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
+			    _log.Error(ex.Message);
 				return $"Не вдалось видалити дані: {ex.Message}";
 			}
 		}
@@ -186,7 +185,7 @@ namespace Codewars_Bot.Services
 			}
 			catch (Exception ex)
 			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}, CodewarsUser: {user.CodewarsUsername}");
+				_log.Error(ex, "CodewarsUser: {user.CodewarsUsername}");
 				return $"Не вдалось створити користувача: {ex.Message}";
 			}
 		}

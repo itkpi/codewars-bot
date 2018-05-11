@@ -4,7 +4,6 @@ namespace Codewars_Bot.Contracts
 {
 	public interface IDatabaseService
 	{
-		void AuditMessageInDatabase(string message);
 		List<string> GetWeeklyRating(int? numberOfUsersToDisplay = null);
 		List<string> GetTotalRating();
 		List<string> GetWeeklyPoints(int userId);

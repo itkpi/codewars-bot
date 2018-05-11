@@ -5,29 +5,29 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Connector;
 using Codewars_Bot.Contracts;
+using Codewars_Bot.Logging;
 
 namespace Codewars_Bot
 {
 	[BotAuthentication]
 	public class MessagesController : ApiController
 	{
-		private IMessageService MessageService { get; set; }
-		private IDatabaseService DatabaseService { get; set; }
+	    private readonly ILog _log;
+	    private readonly IMessageService _messageService;
 
-		public MessagesController(IMessageService messageService, IDatabaseService databaseService)
+		public MessagesController(IMessageService messageService, ILog log)
 		{
-			MessageService = messageService;
-			DatabaseService = databaseService;
+		    _log = log;
+		    _messageService = messageService;
 		}
 
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
-
 			if (activity.Type == ActivityTypes.Message)
 			{
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-				var responseMessages = await MessageService.ProcessMessage(activity);
+				var responseMessages = await _messageService.ProcessMessage(activity);
 
 				try
 				{
@@ -42,7 +42,7 @@ namespace Codewars_Bot
 				}
 				catch (Exception ex)
 				{
-					DatabaseService.AuditMessageInDatabase($"EXCEPTION: {ex.Message} {ex.StackTrace}");
+					_log.Error(ex);
 				}
 			}
 			else

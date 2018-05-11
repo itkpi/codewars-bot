@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Codewars_Bot.Contracts;
+using Codewars_Bot.Logging;
 using Codewars_Bot.Services;
 
 namespace Codewars_Bot
@@ -13,6 +14,7 @@ namespace Codewars_Bot
 			builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();
 			builder.RegisterType<CodewarsService>().As<ICodewarsService>().InstancePerLifetimeScope();
 			builder.RegisterType<DatabaseService>().As<IDatabaseService>().InstancePerLifetimeScope();
+		    builder.RegisterType<DbLog>().As<ILog>().InstancePerLifetimeScope();
 		}
 	}
 }

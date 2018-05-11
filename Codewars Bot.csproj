@@ -23,6 +23,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -144,6 +145,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Logging\DbLog.cs" />
+    <Compile Include="Logging\ILog.cs" />
     <Compile Include="MessagingModule.cs" />
     <Compile Include="Models\AuditMessageModel.cs" />
     <Compile Include="Models\CodewarsResponseModel.cs" />
