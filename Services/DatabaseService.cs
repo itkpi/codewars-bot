@@ -20,7 +20,7 @@ namespace Codewars_Bot.Services
 			}
 		}
 
-		public List<string> GetWeeklyRating(int? numberOfUsersToDisplay = null)
+		public List<string> GetWeeklyRating(bool onlyActiveUsers)
 		{
 			try
 			{
@@ -55,15 +55,15 @@ namespace Codewars_Bot.Services
 					currentWeekUsersRating = currentWeekUsersRating.OrderByDescending(userModel => userModel.Points).ToList();
 
 					var responseList = new List<string>();
-					StringBuilder response = new StringBuilder($@"**Рейтинг клану IT KPI на Codewars. Тиждень: {previousWeek.WeekNumber}**
-															<br/>**Загальна кількість учасників: {currentWeekUsersRating.Count}**<br/>");
+					StringBuilder response = new StringBuilder($@"<b>Рейтинг клану IT KPI на Codewars. Тиждень: {previousWeek.WeekNumber}</b>
+<b>Загальна кількість учасників: {currentWeekUsersRating.Count}</b>");
 
 					foreach (var user in currentWeekUsersRating)
 					{
-						response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user)+1));
-
-						if (numberOfUsersToDisplay != null && currentWeekUsersRating.IndexOf(user) + 1 == numberOfUsersToDisplay.Value)
+						if (onlyActiveUsers && user.Points == 0)
 							break;
+
+						response.Append(FormatUserRatingString(user, currentWeekUsersRating.IndexOf(user)+1));
 
 						if ((currentWeekUsersRating.IndexOf(user) + 1) % 100 == 0)
 						{
@@ -93,7 +93,7 @@ namespace Codewars_Bot.Services
 					var users = connection.Query<UserModel>(query).ToList();
 					var responseList = new List<string>();
 
-					StringBuilder response = new StringBuilder($"**Рейтинг клану IT KPI на Codewars**<br/>");
+					StringBuilder response = new StringBuilder($"<b>Рейтинг клану IT KPI на Codewars</b>");
 
 					var totalUsersRating = users.OrderByDescending(q => q.Points).ToList();
 					foreach (var user in totalUsersRating)
@@ -135,7 +135,7 @@ namespace Codewars_Bot.Services
 
 					foreach (var week in weeklyPoints)
 					{
-						response.Append($"<br/>Week {week.WeekNumber} ({week.EndDate.ToString("dd.MM.yyyy")}): **{week.Points}**");
+						response.Append($"\nWeek {week.WeekNumber} ({week.EndDate.ToString("dd.MM.yyyy")}): <b>{week.Points}</b>");
 						if ((weeklyPoints.IndexOf(week) + 1) % 100 == 0)
 						{
 							responseList.Add(response.ToString());
@@ -207,14 +207,10 @@ namespace Codewars_Bot.Services
 				: "";
 
 			var codewarsLogin = position <= 10
-				? $"**({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}**"
+				? $"<b>({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}</b>"
 				: $"({user.CodewarsUsername.Replace("_", " ")}) - {user.Points}";
 
-			return $"{position}) {telegramLogin} {codewarsLogin} <br/>";
+			return $"\n{position}) {telegramLogin} {codewarsLogin}";
 		}
-
-		//private List<string> SplitResponseMessage() { 
-
-		//}
 	}
 }
