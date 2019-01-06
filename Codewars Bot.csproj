@@ -131,6 +131,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="1.png" />
     <Content Include="DatabaseMigration.sql" />
     <Content Include="default.htm" />
     <Content Include="Global.asax" />

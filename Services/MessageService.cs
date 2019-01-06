@@ -81,9 +81,7 @@ namespace Codewars_Bot.Services
 
 			if (!regex.Match(activity.Text).Success)
 			{
-				return $@"Логін Codewars має містити букви, цифри і знак '_'
-					Якщо ви хотіли дати команду боту -- перевірте правильність написання і чи в ту сторону стоїть слеш на початку.
-					Певні, що це таки ваш нік? Пишіть йому: @maksim36ua";
+				return $@"Логін Codewars має містити букви, цифри і знак '_'. Якщо ви хотіли дати команду боту -- перевірте правильність написання і чи в ту сторону стоїть слеш на початку. Певні, що це таки ваш нік? Пишіть йому: @maksim36ua";
 			}
 
 			var userFromDb = DatabaseService.GetUserById(int.Parse(activity.From.Id));

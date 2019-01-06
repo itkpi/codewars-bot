@@ -9,6 +9,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using System.Linq;
+using System.IO;
 
 namespace Codewars_Bot
 {
@@ -26,9 +27,13 @@ namespace Codewars_Bot
 
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
-			var bot = new TelegramBotClient(Codewars_Bot.Configuration.BotApiToken);
-			var inlineKeyboard = new InlineKeyboardMarkup(new[]
+			try
 			{
+				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+				var bot = new TelegramBotClient(Codewars_Bot.Configuration.BotApiToken);
+				var inlineKeyboard = new InlineKeyboardMarkup(new[]
+				{
 				new []
 				{
 					InlineKeyboardButton.WithCallbackData("Weekly Rating", "/weekly_rating"),
@@ -41,70 +46,39 @@ namespace Codewars_Bot
 				}
 			});
 
-			if (activity.Type == ActivityTypes.Message)
-			{
-				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
 				var responseMessages = await MessageService.ProcessMessage(activity);
 
-				try
+				if (activity.Text == "/picture")
 				{
-					if (responseMessages.Count != 0)
-					{
-						foreach (var message in responseMessages)
-						{
-							if (message == responseMessages.Last() && activity.Text != "/weekly_rating_channel")
-							{
-								await bot.SendTextMessageAsync(new ChatId(activity.Conversation.Id), message,
-										replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
-								continue;
-							}
 
-							await bot.SendTextMessageAsync(new ChatId(activity.Conversation.Id), message, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+					var stream = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "1.png"), FileMode.Open);
+
+					var photo = new Telegram.Bot.Types.InputFiles.InputOnlineFile(stream);
+					await bot.SendPhotoAsync(new ChatId(activity.Conversation.Id), photo, caption: responseMessages.First());
+				}
+
+				if (responseMessages.Count != 0)
+				{
+					foreach (var message in responseMessages)
+					{
+						if (message == responseMessages.Last() && activity.Text != "/weekly_rating_channel")
+						{
+							await bot.SendTextMessageAsync(new ChatId(activity.Conversation.Id), message,
+									replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+							continue;
 						}
+
+						await bot.SendTextMessageAsync(new ChatId(activity.Conversation.Id), message, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
 					}
 				}
-				catch (Exception ex)
-				{
-					DatabaseService.AuditMessageInDatabase($"EXCEPTION: {ex.Message} {ex.StackTrace}");
-				}
 			}
-			else
+			catch (Exception ex)
 			{
-				HandleSystemMessage(activity);
+				DatabaseService.AuditMessageInDatabase($"EXCEPTION: {ex.Message} {ex.StackTrace}");
 			}
 
 			var response = Request.CreateResponse(HttpStatusCode.OK);
 			return response;
-		}
-
-		private Activity HandleSystemMessage(Activity message)
-		{
-			if (message.Type == ActivityTypes.DeleteUserData)
-			{
-				// Implement user deletion here
-				// If we handle user deletion, return a real message
-			}
-			else if (message.Type == ActivityTypes.ConversationUpdate)
-			{
-				// Handle conversation state changes, like members being added and removed
-				// Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-				// Not available in all channels
-			}
-			else if (message.Type == ActivityTypes.ContactRelationUpdate)
-			{
-				// Handle add/remove from contact lists
-				// Activity.From + Activity.Action represent what happened
-			}
-			else if (message.Type == ActivityTypes.Typing)
-			{
-				// Handle knowing tha the user is typing
-			}
-			else if (message.Type == ActivityTypes.Ping)
-			{
-			}
-
-			return null;
 		}
 	}
 }
