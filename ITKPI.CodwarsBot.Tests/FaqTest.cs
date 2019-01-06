@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Codewars_Bot.Contracts;
-using Codewars_Bot.Services;
 using FluentAssertions;
+using ITKPI.CodwarsBot.Tests.Fixture;
 using Microsoft.Bot.Connector;
 using Xunit;
 
@@ -15,7 +14,7 @@ namespace ITKPI.CodwarsBot.Tests
 
         public FaqTest(IntegrationTestFixture fixture)
         {
-            _sut = fixture.ResolveDependency<IMessageService>(); ;
+            _sut = fixture.ResolveDependency<IMessageService>();
         }
 
         [Fact]

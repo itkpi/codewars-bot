@@ -80,3 +80,6 @@ indent_size = 2
 
 [*.csproj]
 indent_size = 2
+
+[*.config]
+indent_size = 2

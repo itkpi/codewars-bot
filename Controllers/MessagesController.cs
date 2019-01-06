@@ -32,7 +32,7 @@ namespace Codewars_Bot
 				new []
 				{
 					InlineKeyboardButton.WithCallbackData("Weekly Rating", "/weekly_rating"),
-					InlineKeyboardButton.WithCallbackData("Total Rating", "/total_rating"),
+					InlineKeyboardButton.WithCallbackData("Total Rating", "/total_rating")
 				},
 				new []
 				{
