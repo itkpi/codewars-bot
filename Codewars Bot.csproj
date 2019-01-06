@@ -134,9 +134,6 @@
     <Content Include="DatabaseMigration.sql" />
     <Content Include="default.htm" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
@@ -168,12 +165,6 @@
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - Web Deploy.pubxml" />
     <Content Include="README.md" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - Web Deploy1.pubxml" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

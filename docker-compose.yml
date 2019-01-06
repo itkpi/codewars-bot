@@ -1,0 +1,9 @@
+version: "3"
+services:
+    db:
+      image: "microsoft/mssql-server-windows-express"
+      environment:
+        SA_PASSWORD: "SomeLongPasswordForRequ1rements!"
+        ACCEPT_EULA: "Y"
+      ports:
+      - "9123:1433"
