@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using Codewars_Bot.Contracts;
 using FluentAssertions;
-using ITKPI.CodwarsBot.Tests.Fixture;
+using ITKPI.CodewarsBot.Tests.Fixture;
 using Microsoft.Bot.Connector;
 using Xunit;
 
-namespace ITKPI.CodwarsBot.Tests
+namespace ITKPI.CodewarsBot.Tests
 {
     public class FaqTest : IClassFixture<IntegrationTestFixture>
     {

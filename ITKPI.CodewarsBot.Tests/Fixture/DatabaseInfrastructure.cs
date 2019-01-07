@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Dapper;
 
-namespace ITKPI.CodwarsBot.Tests.Fixture
+namespace ITKPI.CodewarsBot.Tests.Fixture
 {
     public class DatabaseInfrastructure
     {

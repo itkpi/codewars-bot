@@ -1,13 +1,12 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Autofac;
-using Xunit;
-
 using Codewars_Bot;
 using Codewars_Bot.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Xunit;
 
-namespace ITKPI.CodwarsBot.Tests.Fixture
+namespace ITKPI.CodewarsBot.Tests.Fixture
 {
     public class IntegrationTestFixture : IAsyncLifetime
     {
