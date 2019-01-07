@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Dapper;
 
-namespace ITKPI.CodewarsBot.Tests.Fixture
+namespace Codewars_Bot.Infrastructure
 {
     public class DatabaseInfrastructure
     {
@@ -12,11 +12,11 @@ namespace ITKPI.CodewarsBot.Tests.Fixture
         private readonly string _migrationsPath;
         private readonly string _dbName;
 
-        public DatabaseInfrastructure(string connectionString, string migrationsPath)
+        public DatabaseInfrastructure(string connectionString, string migrationsPath, string dbName = null)
         {
             _connectionString = connectionString;
             _migrationsPath = migrationsPath;
-            _dbName = $"TestDb_{Guid.NewGuid():N}";
+            _dbName = dbName ?? $"TestDb_{Guid.NewGuid():N}";
         }
 
         public string DbConnectionString => $"{_connectionString};Database={_dbName}";
@@ -46,11 +46,16 @@ CREATE DATABASE {_dbName};
 
         public async Task Drop()
         {
-            using (var connection = new SqlConnection(DbConnectionString))
+            using (var connection = new SqlConnection(_connectionString))
             {
+
                 await connection.ExecuteAsync($@"
 USE [master];
-DROP DATABASE {_dbName};
+ALTER DATABASE {_dbName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+"); // Force disconnect everyone
+                await connection.ExecuteAsync($@"
+USE [master];
+DROP DATABASE IF EXISTS {_dbName};
 ");
             }
         }

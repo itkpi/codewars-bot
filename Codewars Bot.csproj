@@ -200,6 +200,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DatabaseMigration.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="default.htm" />
     <Content Include="Global.asax" />
   </ItemGroup>
@@ -214,6 +217,7 @@
     </Compile>
     <Compile Include="Infrastructure\BotConfig.cs" />
     <Compile Include="Infrastructure\CodewarsConfig.cs" />
+    <Compile Include="Infrastructure\DatabaseInfrastructure.cs" />
     <Compile Include="Infrastructure\DbConfig.cs" />
     <Compile Include="Adapters\ConfigurationManagerProvider.cs" />
     <Compile Include="MessagingModule.cs" />
@@ -229,21 +233,20 @@
     <Compile Include="Models\UserModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appsettings.Local.json" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - Web Deploy.pubxml" />
     <Content Include="README.md" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - Web Deploy1.pubxml" />
     <Content Include="Web.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup />
