@@ -233,8 +233,15 @@
     <Compile Include="Models\UserModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.Debug.json" />
-    <None Include="appsettings.json" />
+    <Content Include="appsettings.Debug.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.Release.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - Web Deploy.pubxml" />
