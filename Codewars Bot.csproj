@@ -234,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.Local.json" />
+    <None Include="appsettings.json" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ITKPICodewarsBot - Web Deploy.pubxml" />
