@@ -12,16 +12,25 @@ namespace Codewars_Bot
 {
 	public class WebApiApplication : System.Web.HttpApplication
     {
+        private static string GetMode()
+        {
+#if DEBUG
+            return "Debug";
+#endif
+
+            return "Release";
+        }
+
         protected void Application_Start()
         {
 			var builder = new ContainerBuilder();
 			var httpConfig = GlobalConfiguration.Configuration;
 
+            var mode = GetMode();
+
             var appConfig = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
-#if DEBUG
-                .AddJsonFile("appsettings.Local.json", true)
-#endif
+                .AddJsonFile($"appsettings.{mode}.json", true)
                 .AddEnvironmentVariables("CODEWARSBOT_")
                 .Add(new ConfigurationManagerProvider())
                 .Build();
