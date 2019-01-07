@@ -21,6 +21,23 @@ namespace Codewars_Bot.Infrastructure
 
         public string DbConnectionString => $"{_connectionString};Database={_dbName}";
 
+        public async Task CreateIfNotExists()
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var doesExist = await connection.QueryFirstAsync<int>($@"
+IF DB_ID('{_dbName}') IS NOT NULL
+   SELECT 1;
+ELSE
+   SELECT 0;");
+
+                if (doesExist == 1)
+                    return;
+            }
+
+            await Create();
+        }
+
         public async Task Create()
         {
             using (var connection = new SqlConnection(_connectionString))

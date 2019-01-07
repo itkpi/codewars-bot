@@ -38,8 +38,8 @@ namespace Codewars_Bot
                 var migrationsPath = Path.Combine(currentDirectory, config["MigrationFilePath"]);
                 var dbInfrastructure = new DatabaseInfrastructure(config["DBConnectionString"], migrationsPath, "CodewarsBot_Local");
 
-                dbInfrastructure.Drop().Wait();
-                dbInfrastructure.Create().Wait();
+                dbInfrastructure.CreateIfNotExists().Wait();
+
                 builder.RegisterInstance(new DbConfig
                 {
                     DbConnectionString = dbInfrastructure.DbConnectionString
