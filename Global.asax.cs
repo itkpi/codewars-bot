@@ -17,7 +17,7 @@ namespace Codewars_Bot
 			var builder = new ContainerBuilder();
 			var httpConfig = GlobalConfiguration.Configuration;
 
-            var config = new ConfigurationBuilder()
+            var appConfig = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
 #if DEBUG
                 .AddJsonFile("appsettings.Local.json", true)
@@ -27,16 +27,15 @@ namespace Codewars_Bot
                 .Build();
 
 
-            builder.RegisterModule(new MessagingModule(config));
+            builder.RegisterModule(new MessagingModule(appConfig));
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             builder.RegisterWebApiFilterProvider(httpConfig);
 
-
-            if (bool.TryParse(config["RunMigration"], out var runMigration) && runMigration)
+            if (bool.TryParse(appConfig["RunMigration"], out var runMigration) && runMigration)
             {
                 var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                var migrationsPath = Path.Combine(currentDirectory, config["MigrationFilePath"]);
-                var dbInfrastructure = new DatabaseInfrastructure(config["DBConnectionString"], migrationsPath, "CodewarsBot_Local");
+                var migrationsPath = Path.Combine(currentDirectory, appConfig["MigrationFilePath"]);
+                var dbInfrastructure = new DatabaseInfrastructure(appConfig["DBConnectionString"], migrationsPath, "CodewarsBot_Local");
 
                 dbInfrastructure.CreateIfNotExists().Wait();
 
