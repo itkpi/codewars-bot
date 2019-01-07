@@ -9,24 +9,27 @@ using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using System.Linq;
+using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot
 {
 	[BotAuthentication]
 	public class MessagesController : ApiController
 	{
-		private IMessageService MessageService { get; set; }
-		private IDatabaseService DatabaseService { get; set; }
+	    private readonly BotConfig _config;
+	    private readonly IMessageService _messageService;
+	    private readonly IDatabaseService _databaseService;
 
-		public MessagesController(IMessageService messageService, IDatabaseService databaseService)
+		public MessagesController(IMessageService messageService, IDatabaseService databaseService, BotConfig config)
 		{
-			MessageService = messageService;
-			DatabaseService = databaseService;
+		    _config = config;
+		    _messageService = messageService;
+			_databaseService = databaseService;
 		}
 
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
-			var bot = new TelegramBotClient(Codewars_Bot.Configuration.BotApiToken);
+			var bot = new TelegramBotClient(_config.BotApiToken);
 			var inlineKeyboard = new InlineKeyboardMarkup(new[]
 			{
 				new []
@@ -45,7 +48,7 @@ namespace Codewars_Bot
 			{
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-				var responseMessages = await MessageService.ProcessMessage(activity);
+				var responseMessages = await _messageService.ProcessMessage(activity);
 
 				try
 				{
@@ -66,7 +69,7 @@ namespace Codewars_Bot
 				}
 				catch (Exception ex)
 				{
-					DatabaseService.AuditMessageInDatabase($"EXCEPTION: {ex.Message} {ex.StackTrace}");
+					_databaseService.AuditMessageInDatabase($"EXCEPTION: {ex.Message} {ex.StackTrace}");
 				}
 			}
 			else

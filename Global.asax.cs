@@ -2,6 +2,9 @@
 using Autofac.Integration.WebApi;
 using System.Reflection;
 using System.Web.Http;
+using Codewars_Bot.Adapters;
+using Codewars_Bot.Infrastructure;
+using Microsoft.Extensions.Configuration;
 
 namespace Codewars_Bot
 {
@@ -10,14 +13,20 @@ namespace Codewars_Bot
         protected void Application_Start()
         {
 			var builder = new ContainerBuilder();
-			var config = GlobalConfiguration.Configuration;
+			var httpConfig = GlobalConfiguration.Configuration;
 
-			builder.RegisterModule(new MessagingModule());
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true)
+                .AddEnvironmentVariables("CODEWARSBOT_")
+                .Add(new ConfigurationManagerProvider())
+                .Build();
+
+			builder.RegisterModule(new MessagingModule(config));
 			builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-			builder.RegisterWebApiFilterProvider(config);
+			builder.RegisterWebApiFilterProvider(httpConfig);
 			var container = builder.Build();
 
-			config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
 
 			GlobalConfiguration.Configure(WebApiConfig.Register);
         }
