@@ -6,14 +6,23 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Codewars_Bot.Configuration;
+using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot.Services
 {
 	public class DatabaseService : IDatabaseService
 	{
+	    private readonly DbConfig _config;
+
+	    public DatabaseService(DbConfig config)
+	    {
+	        _config = config;
+	    }
+
 		public void AuditMessageInDatabase(string message)
 		{
-			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+			using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 			{
 				var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
 				connection.Query(query, new AuditMessageModel { Message = message });
@@ -24,7 +33,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 				{
 					var getWeekQuery = $"SELECT TOP 1 * FROM [Rating].[Weeks] ORDER BY WeekNumber DESC";
 					var previousWeek = connection.Query<WeekModel>(getWeekQuery).First();
@@ -87,7 +96,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 				{
 					string query = "SELECT * FROM [User].[Users]";
 					var users = connection.Query<UserModel>(query).ToList();
@@ -120,7 +129,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 				{
 					StringBuilder response = new StringBuilder();
 					var responseList = new List<string>();
@@ -158,7 +167,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 				{
 					string query = $@"DELETE FROM [User].[Users] WHERE TelegramId = {userId}";
 
@@ -177,7 +186,7 @@ namespace Codewars_Bot.Services
 		{
 			try
 			{
-				using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 				{
 					string query = "INSERT INTO [User].[Users](CodewarsUsername,CodewarsFullname,TelegramUsername,TelegramId,DateTime,Points) values(@CodewarsUsername,@CodewarsFullname,@TelegramUsername,@TelegramId,GETDATE(),@Points); SELECT CAST(SCOPE_IDENTITY() as int)";
 					var ra = connection.Query<int>(query, user).SingleOrDefault();
@@ -193,7 +202,7 @@ namespace Codewars_Bot.Services
 
 		public UserModel GetUserById(int userId)
 		{
-			using (SqlConnection connection = new SqlConnection(Configuration.DbConnection))
+			using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
 			{
 				string query = $"SELECT * FROM [User].[Users] WHERE TelegramId = {userId}";
 				return connection.QueryFirstOrDefault<UserModel>(query);
