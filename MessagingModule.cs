@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Codewars_Bot.Configuration;
 using Codewars_Bot.Contracts;
 using Codewars_Bot.Infrastructure;
 using Codewars_Bot.Services;

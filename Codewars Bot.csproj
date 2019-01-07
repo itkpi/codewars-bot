@@ -208,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Configuration\Environment.cs" />
     <Compile Include="Contracts\ICodewarsService.cs" />
     <Compile Include="Contracts\IDatabaseService.cs" />
     <Compile Include="Contracts\IMessageService.cs" />
@@ -215,10 +216,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Infrastructure\BotConfig.cs" />
-    <Compile Include="Infrastructure\CodewarsConfig.cs" />
+    <Compile Include="Configuration\BotConfig.cs" />
+    <Compile Include="Configuration\CodewarsConfig.cs" />
     <Compile Include="Infrastructure\DatabaseInfrastructure.cs" />
-    <Compile Include="Infrastructure\DbConfig.cs" />
+    <Compile Include="Configuration\DbConfig.cs" />
     <Compile Include="Adapters\ConfigurationManagerProvider.cs" />
     <Compile Include="MessagingModule.cs" />
     <Compile Include="Models\AuditMessageModel.cs" />

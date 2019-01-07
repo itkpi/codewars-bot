@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Autofac;
 using Codewars_Bot;
+using Codewars_Bot.Configuration;
 using Codewars_Bot.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Xunit;

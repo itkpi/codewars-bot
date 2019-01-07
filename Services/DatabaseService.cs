@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Codewars_Bot.Configuration;
 using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot.Services

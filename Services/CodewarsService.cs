@@ -5,6 +5,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Codewars_Bot.Configuration;
 using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot.Services

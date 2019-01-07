@@ -5,32 +5,23 @@ using Autofac.Integration.WebApi;
 using System.Reflection;
 using System.Web.Http;
 using Codewars_Bot.Adapters;
+using Codewars_Bot.Configuration;
 using Codewars_Bot.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Environment = Codewars_Bot.Configuration.Environment;
 
 namespace Codewars_Bot
 {
 	public class WebApiApplication : System.Web.HttpApplication
     {
-        private static string GetMode()
-        {
-#if DEBUG
-            return "Debug";
-#endif
-
-            return "Release";
-        }
-
         protected void Application_Start()
         {
 			var builder = new ContainerBuilder();
 			var httpConfig = GlobalConfiguration.Configuration;
 
-            var mode = GetMode();
-
             var appConfig = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
-                .AddJsonFile($"appsettings.{mode}.json", true)
+                .AddJsonFile($"appsettings.{Environment.Name()}.json", true)
                 .AddEnvironmentVariables("CODEWARSBOT_")
                 .Add(new ConfigurationManagerProvider())
                 .Build();

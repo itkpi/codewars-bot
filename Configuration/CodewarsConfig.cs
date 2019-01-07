@@ -1,4 +1,4 @@
-﻿namespace Codewars_Bot.Infrastructure
+﻿namespace Codewars_Bot.Configuration
 {
     public class CodewarsConfig
     {

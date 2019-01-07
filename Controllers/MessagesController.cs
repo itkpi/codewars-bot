@@ -9,6 +9,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using System.Linq;
+using Codewars_Bot.Configuration;
 using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot
