@@ -6,7 +6,6 @@ using Xunit;
 using Codewars_Bot;
 using Codewars_Bot.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
 namespace ITKPI.CodwarsBot.Tests.Fixture
 {
