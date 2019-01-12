@@ -1,8 +1,8 @@
 ﻿using Autofac;
+using Codewars_Bot.Codewars;
 using Codewars_Bot.Configuration;
 using Codewars_Bot.Contracts;
 using Codewars_Bot.DataAccess;
-using Codewars_Bot.Infrastructure;
 using Codewars_Bot.Services;
 using Microsoft.Extensions.Configuration;
 

@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Codewars_Bot.Configuration;
 
-namespace Codewars_Bot.Services
+namespace Codewars_Bot.Codewars
 {
     public class CodewarsApiClient : ICodewarsApiClient
     {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using Codewars_Bot.Configuration;
 
-namespace Codewars_Bot.Services
+namespace Codewars_Bot.DataAccess
 {
 	public class DatabaseService : IDatabaseService
 	{

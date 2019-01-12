@@ -4,10 +4,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Codewars_Bot.DataAccess;
-using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot.Services
 {
@@ -15,12 +13,12 @@ namespace Codewars_Bot.Services
 	{
         private readonly IUsersRepository _usersRepository;
         private readonly ICodewarsApiClient _codewarsClient;
-        private IDatabaseService DatabaseService { get; set; }
+        private readonly IDatabaseService _databaseService;
 
 		public MessageService(ICodewarsApiClient codewarsClient, IDatabaseService databaseService, IUsersRepository usersRepository)
 		{
             _usersRepository = usersRepository;
-            DatabaseService = databaseService;
+            _databaseService = databaseService;
 			_codewarsClient = codewarsClient;
 		}
 
@@ -36,15 +34,15 @@ namespace Codewars_Bot.Services
                     Message = activity.Text
                 };
 
-                DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
+                _databaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
 
                 switch (activity.Text)
                 {
                     case "/weekly_rating":
-                        reply = DatabaseService.GetWeeklyRating(false);
+                        reply = _databaseService.GetWeeklyRating(false);
                         break;
                     case "/total_rating":
-                        reply = DatabaseService.GetTotalRating();
+                        reply = _databaseService.GetTotalRating();
                         break;
                     case "/my_weekly_points":
                         reply = GetWeeklyPoints(activity);
@@ -65,12 +63,12 @@ namespace Codewars_Bot.Services
                         break;
                 }
 
-                DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(reply));
+                _databaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(reply));
                 return reply;
             }
 			catch (Exception ex)
 			{
-				DatabaseService.AuditMessageInDatabase($"ERROR: {ex.Message} {ex.StackTrace}");
+				_databaseService.AuditMessageInDatabase($"ERROR: {ex.Message} {ex.StackTrace}");
 				return new List<string>();
 			}
 		}
@@ -117,14 +115,14 @@ namespace Codewars_Bot.Services
             }
             catch (Exception e)
             {
-                DatabaseService.AuditMessageInDatabase($"EXCEPTION: {e.Message}, CodewarsUser: {user.CodewarsUsername}");
+                _databaseService.AuditMessageInDatabase($"EXCEPTION: {e.Message}, CodewarsUser: {user.CodewarsUsername}");
                 return $"Не вдалось створити користувача: {e.Message}";
             }
 		}
 
 		private List<string> GetWeeklyPoints(Activity activity)
 		{
-			return DatabaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
+			return _databaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
 		}
 
 		private async Task<string> DeleteUserInfo(Activity activity)
@@ -137,14 +135,14 @@ namespace Codewars_Bot.Services
             }
             catch (Exception e)
             {
-                DatabaseService.AuditMessageInDatabase($"EXCEPTION: {e.Message}");
+                _databaseService.AuditMessageInDatabase($"EXCEPTION: {e.Message}");
                 return $"Не вдалось видалити дані: {e.Message}";
             }
 		}
 
 		private List<string> GetWeeklyRatingForChannel()
 		{
-			var rating = string.Concat(DatabaseService.GetWeeklyRating(true).First(), $@"
+			var rating = string.Concat(_databaseService.GetWeeklyRating(true).First(), $@"
 Зареєструватись в клані і почати набирати бали можна тут: @itkpi_codewars_bot. Запрошуйте друзів і гайда рубитись! Якщо маєте питання чи баг репорт -- пишіть йому: @maksim36ua");
 
 			return new List<string> { rating };

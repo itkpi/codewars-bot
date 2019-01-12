@@ -229,8 +229,8 @@
     <Compile Include="Models\WeeklyRatingUserModel.cs" />
     <Compile Include="Models\WeekModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\CodewarsApiClient.cs" />
-    <Compile Include="Services\DatabaseService.cs" />
+    <Compile Include="Codewars\CodewarsApiClient.cs" />
+    <Compile Include="DataAccess\DatabaseService.cs" />
     <Compile Include="Services\MessageService.cs" />
     <Compile Include="Models\UserModel.cs" />
   </ItemGroup>
