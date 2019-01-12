@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Codewars_Bot.Contracts
 {
-	public interface ICodewarsService
+	public interface ICodewarsApiClient
 	{
 		Task<CodewarsResponseModel> GetCodewarsUser(string username);
 	}

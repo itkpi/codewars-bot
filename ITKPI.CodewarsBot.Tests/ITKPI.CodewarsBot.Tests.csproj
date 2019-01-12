@@ -241,8 +241,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Fixture\IntegrationTestFixture.cs" />
-    <Compile Include="FaqTest.cs" />
+    <Compile Include="MessageTests\FaqTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MessageTests\UserTests.cs" />
+    <Compile Include="Stubs\CodewarsApiClientStub.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="appsettings.json">

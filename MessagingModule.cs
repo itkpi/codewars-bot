@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Codewars_Bot.Configuration;
 using Codewars_Bot.Contracts;
+using Codewars_Bot.DataAccess;
 using Codewars_Bot.Infrastructure;
 using Codewars_Bot.Services;
 using Microsoft.Extensions.Configuration;
@@ -33,8 +34,10 @@ namespace Codewars_Bot
 		    builder.RegisterInstance(dbConfig).AsSelf();
 
             builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();
-			builder.RegisterType<CodewarsService>().As<ICodewarsService>().InstancePerLifetimeScope();
 			builder.RegisterType<DatabaseService>().As<IDatabaseService>().InstancePerLifetimeScope();
-		}
+            builder.RegisterType<UsersRepository>().As<IUsersRepository>().InstancePerLifetimeScope();
+
+            builder.RegisterType<CodewarsApiClient>().As<ICodewarsApiClient>().SingleInstance();
+        }
 	}
 }

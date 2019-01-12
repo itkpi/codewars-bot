@@ -6,64 +6,68 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Codewars_Bot.DataAccess;
+using Codewars_Bot.Infrastructure;
 
 namespace Codewars_Bot.Services
 {
 	public class MessageService : IMessageService
 	{
-		private IDatabaseService DatabaseService { get; set; }
-		private ICodewarsService CodewarsService { get; set; }
+        private readonly IUsersRepository _usersRepository;
+        private readonly ICodewarsApiClient _codewarsClient;
+        private IDatabaseService DatabaseService { get; set; }
 
-		public MessageService(ICodewarsService codewarsService, IDatabaseService databaseService)
+		public MessageService(ICodewarsApiClient codewarsClient, IDatabaseService databaseService, IUsersRepository usersRepository)
 		{
-			DatabaseService = databaseService;
-			CodewarsService = codewarsService;
+            _usersRepository = usersRepository;
+            DatabaseService = databaseService;
+			_codewarsClient = codewarsClient;
 		}
 
 		public async Task<List<string>> ProcessMessage(Activity activity)
 		{
-			try
-			{
-				var reply = new List<string>();
-				var requestContent = new
-				{
-					UserId = activity.From.Id,
-					UserName = activity.From.Name,
-					Message = activity.Text
-				};
+            try
+            {
+                var reply = new List<string>();
+                var requestContent = new
+                {
+                    UserId = activity.From.Id,
+                    UserName = activity.From.Name,
+                    Message = activity.Text
+                };
 
-				DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
+                DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(requestContent));
 
-				switch (activity.Text)
-				{
-					case "/weekly_rating":
-						reply = DatabaseService.GetWeeklyRating(false);
-						break;
-					case "/total_rating":
-						reply = DatabaseService.GetTotalRating();
-						break;
-					case "/my_weekly_points":
-						reply = GetWeeklyPoints(activity);
-						break;
-					case "/delete_userinfo":
-						reply.Add(DeleteUserInfo(activity));
-						break;
-					case "/weekly_rating_channel":
-						reply = GetWeeklyRatingForChannel();
-						break;
-					case "/start":
-					case "/show_faq":
-						reply.Add(ShowFaq());
-						break;
-					default:
-						var userResponse = await SaveNewUser(activity);
-						reply.Add(userResponse);
-						break;
-				}
+                switch (activity.Text)
+                {
+                    case "/weekly_rating":
+                        reply = DatabaseService.GetWeeklyRating(false);
+                        break;
+                    case "/total_rating":
+                        reply = DatabaseService.GetTotalRating();
+                        break;
+                    case "/my_weekly_points":
+                        reply = GetWeeklyPoints(activity);
+                        break;
+                    case "/delete_userinfo":
+                        reply.Add(await DeleteUserInfo(activity));
+                        break;
+                    case "/weekly_rating_channel":
+                        reply = GetWeeklyRatingForChannel();
+                        break;
+                    case "/start":
+                    case "/show_faq":
+                        reply.Add(ShowFaq());
+                        break;
+                    default:
+                        var userResponse = await SaveNewUser(activity);
+                        reply.Add(userResponse);
+                        break;
+                }
 
-				DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(reply));
-				return reply;
-			}
+                DatabaseService.AuditMessageInDatabase(JsonConvert.SerializeObject(reply));
+                return reply;
+            }
 			catch (Exception ex)
 			{
 				DatabaseService.AuditMessageInDatabase($"ERROR: {ex.Message} {ex.StackTrace}");
@@ -73,43 +77,49 @@ namespace Codewars_Bot.Services
 
 		private async Task<string> SaveNewUser(Activity activity)
 		{
-			if ((bool)activity.Conversation.IsGroup)
+			if (activity.Conversation.IsGroup.GetValueOrDefault())
 				return string.Empty;
 
-			var regex = new Regex(@"^[a-zA-Z0-9\s_.-]+$", RegexOptions.IgnoreCase);
+            var codewarsUserName = activity.Text;
+            var telegramId = int.Parse(activity.From.Id);
 
-			if (!regex.Match(activity.Text).Success)
+            if (!UserModel.IsValidCodewarsUserName(codewarsUserName))
 			{
-				return $@"Логін Codewars має містити букви, цифри і знак '_'
+				return @"Логін Codewars має містити букви, цифри і знак '_'
 					Якщо ви хотіли дати команду боту -- перевірте правильність написання і чи в ту сторону стоїть слеш на початку.
 					Певні, що це таки ваш нік? Пишіть йому: @maksim36ua";
 			}
 
-			var userFromDb = DatabaseService.GetUserById(int.Parse(activity.From.Id));
+            var user = await _usersRepository.Find(telegramId);
 
-			if (userFromDb != null)
-				return $"Ви вже зареєстровані в рейтингу Codewars під ніком {userFromDb.CodewarsUsername}";
+            if (user != null)
+            {
+                return $"Ви вже зареєстровані в рейтингу Codewars під ніком {user.CodewarsUsername}";
+            }
 
-			var user = new UserModel
-			{
-				CodewarsUsername = activity.Text,
-				TelegramUsername = activity.From.Name,
-				TelegramId = int.Parse(activity.From.Id)
-			};
+            var codewarsUser = await _codewarsClient.GetCodewarsUser(codewarsUserName);
 
-			var codewarsUser = await CodewarsService.GetCodewarsUser(user.CodewarsUsername);
+            if (codewarsUser == null)
+            {
+                return $"Користувач {codewarsUserName} не зареєстрований на Codewars";
+            }
 
-			if (codewarsUser == null)
-			{
-				return $"Користувач {user.CodewarsUsername} не зареєстрований на Codewars";
-			}
-			else
-			{
-				user.CodewarsFullname = codewarsUser.Name;
-				user.Points = codewarsUser.Honor;
-			}
+            user = UserModel.Create(telegramId,
+                activity.From.Name,
+                codewarsUserName,
+                codewarsUser.Name,
+                codewarsUser.Honor);
 
-			return DatabaseService.SaveUserToDatabase(user);
+            try
+            {
+                await _usersRepository.Add(user);
+                return $"Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
+            }
+            catch (Exception e)
+            {
+                DatabaseService.AuditMessageInDatabase($"EXCEPTION: {e.Message}, CodewarsUser: {user.CodewarsUsername}");
+                return $"Не вдалось створити користувача: {e.Message}";
+            }
 		}
 
 		private List<string> GetWeeklyPoints(Activity activity)
@@ -117,9 +127,19 @@ namespace Codewars_Bot.Services
 			return DatabaseService.GetWeeklyPoints(int.Parse(activity.From.Id));
 		}
 
-		private string DeleteUserInfo(Activity activity)
-		{
-			return DatabaseService.DeleteUserInfo(int.Parse(activity.From.Id));
+		private async Task<string> DeleteUserInfo(Activity activity)
+        {
+            try
+            {
+                var telegramId = int.Parse(activity.From.Id);
+                await _usersRepository.Delete(telegramId);
+                return "Видалення пройшло успішно";
+            }
+            catch (Exception e)
+            {
+                DatabaseService.AuditMessageInDatabase($"EXCEPTION: {e.Message}");
+                return $"Не вдалось видалити дані: {e.Message}";
+            }
 		}
 
 		private List<string> GetWeeklyRatingForChannel()

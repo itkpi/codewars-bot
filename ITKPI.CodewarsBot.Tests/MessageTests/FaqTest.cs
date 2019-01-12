@@ -6,7 +6,7 @@ using ITKPI.CodewarsBot.Tests.Fixture;
 using Microsoft.Bot.Connector;
 using Xunit;
 
-namespace ITKPI.CodewarsBot.Tests
+namespace ITKPI.CodewarsBot.Tests.MessageTests
 {
     public class FaqTest : IClassFixture<IntegrationTestFixture>
     {
