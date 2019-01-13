@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -34,8 +29,11 @@ namespace ITKPI.CodewarsBot.Api
                 {
                     logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
                     logging.AddConsole();
-                    logging.AddDebug();
-                    logging.AddEventSourceLogger();
+
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        logging.AddDebug();
+                    }
                 })
                 .UseStartup<Startup>();
     }
