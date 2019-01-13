@@ -6,4 +6,4 @@ services:
         SA_PASSWORD: "SomeLongPasswordForRequ1rements!"
         ACCEPT_EULA: "Y"
       ports:
-      - "9123:1433"
+      - "9321:1433"
