@@ -5,7 +5,7 @@ https://t.me/itkpi_codewars_bot
 
 ### Run mssql server locally
 - Make sure [Docker for windows](https://docs.docker.com/docker-for-windows/) is installed
-- Make sure linux are enabled containers
+- Make sure linux containers are enabled
 - Run `docker-compose up` in the root folder of the repository
 
 See `docker-compose.yml` for the db configuration
