@@ -43,7 +43,6 @@ namespace ITKPI.CodewarsBot.Api
                     };
                 });
 
-            services.Configure<BotConfig>(_configuration);
             services.Configure<CodewarsConfig>(_configuration);
             services.Configure<DbConfig>(_configuration);
 
