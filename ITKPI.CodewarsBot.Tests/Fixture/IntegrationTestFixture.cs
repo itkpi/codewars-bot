@@ -1,56 +1,47 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Autofac;
-using Codewars_Bot;
-using Codewars_Bot.Configuration;
-using Codewars_Bot.Infrastructure;
-using Microsoft.Extensions.Configuration;
+﻿using System.Threading.Tasks;
+using ITKPI.CodewarsBot.Api;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Xunit;
 
 namespace ITKPI.CodewarsBot.Tests.Fixture
 {
-    public class IntegrationTestFixture : IAsyncLifetime
+    public class IntegrationTestFixture : TestServer, IAsyncLifetime
     {
-        private ILifetimeScope _scope;
-        private DatabaseInfrastructure _dbInfrastructure;
-
-        public async Task InitializeAsync()
+        public IntegrationTestFixture()
+        : base(Configure())
         {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var migrationsPath = Path.Combine(currentDirectory, config["MigrationFilePath"]);
-            _dbInfrastructure = new DatabaseInfrastructure(config["DBConnectionString"], migrationsPath);
-            await _dbInfrastructure.Create();
-
-            InitAutofac(config);
+            
         }
 
-        private void InitAutofac(IConfiguration config)
+        public static IWebHostBuilder Configure()
         {
-            var builder = new ContainerBuilder();
+            return new WebHostBuilder()
+                .ConfigureAppConfiguration(builder =>
+                {
+                    builder.AddJsonFile("appsettings.json", true, reloadOnChange: false);
+                })
+                .ConfigureServices(services =>
+                {
 
-            builder.RegisterModule(new MessagingModule(config));
-            builder.RegisterInstance(new DbConfig
-            {
-                DbConnectionString = _dbInfrastructure.DbConnectionString
-            });
-
-            var container = builder.Build();
-
-            _scope = container.BeginLifetimeScope();
+                })
+                .UseStartup<Startup>();
         }
 
         public T ResolveDependency<T>()
         {
-            return _scope.Resolve<T>();
+            return Host.Services.GetService<T>();
+        }
+
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         public async Task DisposeAsync()
         {
-            await _dbInfrastructure.Drop();
+            var dbInfrastructure = ResolveDependency<DbInfrastructure>();
+            await dbInfrastructure.Drop();
         }
     }
 }

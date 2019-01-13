@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Codewars_Bot.Contracts;
 using FluentAssertions;
+using ITKPI.CodewarsBot.Api.Contracts;
 using ITKPI.CodewarsBot.Tests.Fixture;
 using Microsoft.Bot.Connector;
 using Xunit;
