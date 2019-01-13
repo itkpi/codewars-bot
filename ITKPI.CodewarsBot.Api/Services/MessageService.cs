@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ITKPI.CodewarsBot.Api.Contracts;
 using ITKPI.CodewarsBot.Api.Models;
-using Microsoft.Bot.Connector;
+using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
 
 namespace ITKPI.CodewarsBot.Api.Services
@@ -74,7 +74,7 @@ namespace ITKPI.CodewarsBot.Api.Services
 
 		private async Task<string> SaveNewUser(Activity activity)
 		{
-			if ((bool)activity.Conversation.IsGroup)
+			if (activity.Conversation.IsGroup.GetValueOrDefault())
 				return string.Empty;
 
 			var regex = new Regex(@"^[a-zA-Z0-9\s_.-]+$", RegexOptions.IgnoreCase);

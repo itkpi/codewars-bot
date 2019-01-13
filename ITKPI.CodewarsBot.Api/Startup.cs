@@ -6,6 +6,8 @@ using ITKPI.CodewarsBot.Api.Infrastructure;
 using ITKPI.CodewarsBot.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Bot.Builder.BotFramework;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -45,9 +47,9 @@ namespace ITKPI.CodewarsBot.Api
             services.Configure<CodewarsConfig>(_configuration);
             services.Configure<DbConfig>(_configuration);
 
-            services.TryAddScoped<IMessageService, MessageService>();
-            services.TryAddScoped<ICodewarsService, CodewarsService>();
-            services.TryAddScoped<IDatabaseService, DatabaseService>();
+            services.TryAddTransient<IMessageService, MessageService>();
+            services.TryAddTransient<ICodewarsService, CodewarsService>();
+            services.TryAddTransient<IDatabaseService, DatabaseService>();
 
 
             if (bool.TryParse(_configuration["RunMigration"], out var runMigration) && runMigration)
@@ -62,11 +64,13 @@ namespace ITKPI.CodewarsBot.Api
 
                 services.AddSingleton(dbInfrastructure);
 
-                services.AddSingleton(new DbConfig
-                {
-                    DbConnectionString = dbInfrastructure.DbConnectionString
-                });
+                _configuration["DbConnectionString"] = dbInfrastructure.DbConnectionString;
             }
+
+            services.AddBot<CodewarsBot>(options =>
+            {
+                options.CredentialProvider = new ConfigurationCredentialProvider(_configuration);
+            });
 
             return services.BuildServiceProvider();
         }
@@ -78,7 +82,9 @@ namespace ITKPI.CodewarsBot.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            app.UseBotFramework();
         }
     }
 }

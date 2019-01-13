@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ITKPI.CodewarsBot.Api\ITKPI.CodewarsBot.Api\ITKPI.CodewarsBot.Api.csproj" />
+    <ProjectReference Include="..\ITKPI.CodewarsBot.Api\ITKPI.CodewarsBot.Api.csproj" />
   </ItemGroup>
 
   </Project>

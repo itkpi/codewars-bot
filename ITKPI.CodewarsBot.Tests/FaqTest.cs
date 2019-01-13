@@ -4,6 +4,7 @@ using FluentAssertions;
 using ITKPI.CodewarsBot.Api.Contracts;
 using ITKPI.CodewarsBot.Tests.Fixture;
 using Microsoft.Bot.Connector;
+using Microsoft.Bot.Schema;
 using Xunit;
 
 namespace ITKPI.CodewarsBot.Tests

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using ITKPI.CodewarsBot.Api.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ITKPI.CodewarsBot.Api.Services
 {
@@ -13,9 +14,9 @@ namespace ITKPI.CodewarsBot.Api.Services
     {
         private readonly CodewarsConfig _config;
 
-        public CodewarsService(CodewarsConfig config)
+        public CodewarsService(IOptions<CodewarsConfig> config)
         {
-            _config = config;
+            _config = config.Value;
         }
 
         public async Task<CodewarsResponseModel> GetCodewarsUser(string username)
