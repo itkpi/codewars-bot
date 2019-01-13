@@ -8,7 +8,7 @@ https://t.me/itkpi_codewars_bot
 - Make sure linux containers are enabled
 - Run `docker-compose up` in the root folder of the repository
 
-See `docker-compose.yml` for the db configuration
+See `docker-compose.yml` for the db configuration 
 
 To connect you could use the connection string described in `appsettings.Local.json`
 
