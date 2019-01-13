@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		DatabaseMigration.sql = DatabaseMigration.sql
 		docker-compose.yml = docker-compose.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITKPI.CodewarsBot.Api", "ITKPI.CodewarsBot.Api\ITKPI.CodewarsBot.Api.csproj", "{1B621955-16A3-46C5-AC4B-098817470324}"
