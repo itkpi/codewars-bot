@@ -50,7 +50,6 @@ namespace ITKPI.CodewarsBot.Api
             services.TryAddTransient<ICodewarsService, CodewarsService>();
             services.TryAddTransient<IDatabaseService, DatabaseService>();
 
-
             if (bool.TryParse(_configuration["RunMigration"], out var runMigration) && runMigration)
             {
                 var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
