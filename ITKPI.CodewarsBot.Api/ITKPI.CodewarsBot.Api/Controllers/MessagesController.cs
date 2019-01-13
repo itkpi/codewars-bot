@@ -103,9 +103,6 @@ namespace ITKPI.CodewarsBot.Api.Controllers
 			{
 				// Handle knowing tha the user is typing
 			}
-            else if (message.Type == ActivityTypes.Ping)
-            {
-            }
 
             return null;
 		}

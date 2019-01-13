@@ -2,7 +2,10 @@
 using ITKPI.CodewarsBot.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Xunit;
+using ITKPI.CodewarsBot.Api.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ITKPI.CodewarsBot.Tests.Fixture
 {
@@ -40,7 +43,7 @@ namespace ITKPI.CodewarsBot.Tests.Fixture
 
         public async Task DisposeAsync()
         {
-            var dbInfrastructure = ResolveDependency<DbInfrastructure>();
+            var dbInfrastructure = ResolveDependency<DatabaseInfrastructure>();
             await dbInfrastructure.Drop();
         }
     }
