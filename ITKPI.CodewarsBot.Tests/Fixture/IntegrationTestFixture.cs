@@ -33,7 +33,7 @@ namespace ITKPI.CodewarsBot.Tests.Fixture
 
         public T ResolveDependency<T>()
         {
-            return Host.Services.GetService<T>();
+            return Host.Services.GetRequiredService<T>();
         }
 
         public Task InitializeAsync()
