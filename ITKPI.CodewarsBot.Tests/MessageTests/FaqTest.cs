@@ -1,14 +1,15 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Codewars_Bot.Contracts;
 using FluentAssertions;
+using ITKPI.CodewarsBot.Api.Contracts;
 using ITKPI.CodewarsBot.Tests.Fixture;
-using Microsoft.Bot.Connector;
+using Microsoft.Bot.Schema;
 using Xunit;
 
 namespace ITKPI.CodewarsBot.Tests.MessageTests
 {
-    public class FaqTest : IClassFixture<IntegrationTestFixture>
+    [Collection("IntegrationTests")]
+    public class FaqTest
     {
         private readonly IMessageService _sut;
 

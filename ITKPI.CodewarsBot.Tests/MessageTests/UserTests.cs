@@ -1,17 +1,17 @@
 ﻿using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Codewars_Bot;
-using Codewars_Bot.Contracts;
-using Codewars_Bot.DataAccess;
 using FluentAssertions;
+using ITKPI.CodewarsBot.Api.Contracts;
+using ITKPI.CodewarsBot.Api.DataAccess;
+using ITKPI.CodewarsBot.Api.Models;
 using ITKPI.CodewarsBot.Tests.Fixture;
-using Microsoft.Bot.Connector;
+using Microsoft.Bot.Schema;
 using Xunit;
 
 namespace ITKPI.CodewarsBot.Tests.MessageTests
 {
-    public class UserTests : IClassFixture<IntegrationTestFixture>
+    [Collection("IntegrationTests")]
+    public class UserTests
     {
         private readonly IMessageService _sut;
         private readonly IUsersRepository _usersRepository;
