@@ -1,9 +1,11 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Codewars_Bot.Configuration;
 using Dapper;
+using ITKPI.CodewarsBot.Api.Configuration;
+using ITKPI.CodewarsBot.Api.Models;
+using Microsoft.Extensions.Options;
 
-namespace Codewars_Bot.DataAccess
+namespace ITKPI.CodewarsBot.Api.DataAccess
 {
     public interface IUsersRepository
     {
@@ -18,9 +20,9 @@ namespace Codewars_Bot.DataAccess
     {
         private readonly DbConfig _dbConfig;
 
-        public UsersRepository(DbConfig dbConfig)
+        public UsersRepository(IOptions<DbConfig> dbConfig)
         {
-            _dbConfig = dbConfig;
+            _dbConfig = dbConfig.Value;
         }
 
         public async Task<UserModel> Find(int telegramId)

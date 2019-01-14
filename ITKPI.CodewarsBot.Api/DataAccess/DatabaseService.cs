@@ -1,22 +1,23 @@
-﻿using Codewars_Bot.Contracts;
-using Codewars_Bot.Models;
-using Dapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using Codewars_Bot.Configuration;
+using Dapper;
+using ITKPI.CodewarsBot.Api.Configuration;
+using ITKPI.CodewarsBot.Api.Contracts;
+using ITKPI.CodewarsBot.Api.Models;
+using Microsoft.Extensions.Options;
 
-namespace Codewars_Bot.DataAccess
+namespace ITKPI.CodewarsBot.Api.DataAccess
 {
 	public class DatabaseService : IDatabaseService
 	{
 	    private readonly DbConfig _config;
 
-	    public DatabaseService(DbConfig config)
+	    public DatabaseService(IOptions<DbConfig> config)
 	    {
-	        _config = config;
+	        _config = config.Value;
 	    }
 
 		public void AuditMessageInDatabase(string message)

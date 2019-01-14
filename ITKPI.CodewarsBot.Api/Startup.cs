@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using ITKPI.CodewarsBot.Api.Codewars;
 using ITKPI.CodewarsBot.Api.Configuration;
 using ITKPI.CodewarsBot.Api.Contracts;
+using ITKPI.CodewarsBot.Api.DataAccess;
 using ITKPI.CodewarsBot.Api.Infrastructure;
 using ITKPI.CodewarsBot.Api.Services;
 using Microsoft.AspNetCore.Builder;
@@ -40,8 +42,8 @@ namespace ITKPI.CodewarsBot.Api
             services.Configure<DbConfig>(_configuration);
 
             services.TryAddTransient<IMessageService, MessageService>();
-            services.TryAddTransient<ICodewarsService, CodewarsService>();
             services.TryAddTransient<IDatabaseService, DatabaseService>();
+            services.TryAddSingleton<ICodewarsApiClient, CodewarsApiClient>();
 
             if (bool.TryParse(_configuration["RunMigration"], out var runMigration) && runMigration)
             {

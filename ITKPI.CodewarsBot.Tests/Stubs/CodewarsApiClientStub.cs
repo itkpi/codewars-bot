@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Codewars_Bot.Contracts;
-using Codewars_Bot.Models;
+using ITKPI.CodewarsBot.Api.Contracts;
+using ITKPI.CodewarsBot.Api.Models;
 
 namespace ITKPI.CodewarsBot.Tests.Stubs
 {

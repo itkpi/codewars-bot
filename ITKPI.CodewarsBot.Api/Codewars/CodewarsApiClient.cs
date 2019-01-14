@@ -1,22 +1,23 @@
-﻿using Codewars_Bot.Contracts;
-using Codewars_Bot.Models;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Codewars_Bot.Configuration;
+using ITKPI.CodewarsBot.Api.Configuration;
+using ITKPI.CodewarsBot.Api.Contracts;
+using ITKPI.CodewarsBot.Api.Models;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
-namespace Codewars_Bot.Codewars
+namespace ITKPI.CodewarsBot.Api.Codewars
 {
     public class CodewarsApiClient : ICodewarsApiClient
     {
         private readonly HttpClient _httpClient;
 
-        public CodewarsApiClient(CodewarsConfig config)
+        public CodewarsApiClient(IOptions<CodewarsConfig> config)
         {
             _httpClient = new HttpClient();
-            ConfigureClient(config);
+            ConfigureClient(config.Value);
         }
 
         private void ConfigureClient(CodewarsConfig config)

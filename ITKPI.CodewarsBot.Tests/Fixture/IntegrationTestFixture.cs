@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using ITKPI.CodewarsBot.Api;
+using ITKPI.CodewarsBot.Api.Contracts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 using ITKPI.CodewarsBot.Api.Infrastructure;
+using ITKPI.CodewarsBot.Tests.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ITKPI.CodewarsBot.Tests.Fixture
@@ -26,7 +28,7 @@ namespace ITKPI.CodewarsBot.Tests.Fixture
                 })
                 .ConfigureServices(services =>
                 {
-
+                    services.AddSingleton<ICodewarsApiClient, CodewarsApiClientStub>();
                 })
                 .UseStartup<Startup>();
         }
