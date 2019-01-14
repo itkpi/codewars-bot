@@ -35,7 +35,7 @@ namespace ITKPI.CodewarsBot.Api.DataAccess
             }
             catch (Exception e)
             {
-                _log.LogError(e, "Could not audit message {message} in database", message);
+                _log.LogError(e, "Could not audit message '{message}' in database", message);
             }
         }
 
