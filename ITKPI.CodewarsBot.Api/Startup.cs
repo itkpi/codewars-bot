@@ -41,6 +41,7 @@ namespace ITKPI.CodewarsBot.Api
             services.Configure<CodewarsConfig>(_configuration);
             services.Configure<DbConfig>(_configuration);
 
+            services.TryAddTransient<IUsersRepository, UsersRepository>();
             services.TryAddTransient<IMessageService, MessageService>();
             services.TryAddTransient<IDatabaseService, DatabaseService>();
             services.TryAddSingleton<ICodewarsApiClient, CodewarsApiClient>();
