@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using Autofac;
 using Codewars_Bot;
 using Codewars_Bot.Configuration;
+using Codewars_Bot.Contracts;
 using Codewars_Bot.Infrastructure;
+using ITKPI.CodewarsBot.Tests.Stubs;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
@@ -37,6 +39,8 @@ namespace ITKPI.CodewarsBot.Tests.Fixture
             {
                 DbConnectionString = _dbInfrastructure.DbConnectionString
             });
+
+            builder.RegisterInstance(new CodewarsApiClientStub()).As<ICodewarsApiClient>();
 
             var container = builder.Build();
 

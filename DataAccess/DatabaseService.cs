@@ -7,9 +7,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Codewars_Bot.Configuration;
-using Codewars_Bot.Infrastructure;
 
-namespace Codewars_Bot.Services
+namespace Codewars_Bot.DataAccess
 {
 	public class DatabaseService : IDatabaseService
 	{
@@ -160,52 +159,6 @@ namespace Codewars_Bot.Services
 			{
 				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
 				return new List<string>();
-			}
-		}
-
-		public string DeleteUserInfo(int userId)
-		{
-			try
-			{
-				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-				{
-					string query = $@"DELETE FROM [User].[Users] WHERE TelegramId = {userId}";
-
-					connection.Query(query);
-					return "Видалення пройшло успішно";
-				}
-			}
-			catch (Exception ex)
-			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
-				return $"Не вдалось видалити дані: {ex.Message}";
-			}
-		}
-
-		public string SaveUserToDatabase(UserModel user)
-		{
-			try
-			{
-				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-				{
-					string query = "INSERT INTO [User].[Users](CodewarsUsername,CodewarsFullname,TelegramUsername,TelegramId,DateTime,Points) values(@CodewarsUsername,@CodewarsFullname,@TelegramUsername,@TelegramId,GETDATE(),@Points); SELECT CAST(SCOPE_IDENTITY() as int)";
-					var ra = connection.Query<int>(query, user).SingleOrDefault();
-					return $"Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
-				}
-			}
-			catch (Exception ex)
-			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}, CodewarsUser: {user.CodewarsUsername}");
-				return $"Не вдалось створити користувача: {ex.Message}";
-			}
-		}
-
-		public UserModel GetUserById(int userId)
-		{
-			using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-			{
-				string query = $"SELECT * FROM [User].[Users] WHERE TelegramId = {userId}";
-				return connection.QueryFirstOrDefault<UserModel>(query);
 			}
 		}
 
