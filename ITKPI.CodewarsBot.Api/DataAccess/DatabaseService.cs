@@ -7,27 +7,37 @@ using Dapper;
 using ITKPI.CodewarsBot.Api.Configuration;
 using ITKPI.CodewarsBot.Api.Contracts;
 using ITKPI.CodewarsBot.Api.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace ITKPI.CodewarsBot.Api.DataAccess
 {
 	public class DatabaseService : IDatabaseService
 	{
-	    private readonly DbConfig _config;
+        private readonly ILogger<DatabaseService> _log;
+        private readonly DbConfig _config;
 
-	    public DatabaseService(IOptions<DbConfig> config)
-	    {
-	        _config = config.Value;
-	    }
+	    public DatabaseService(IOptions<DbConfig> config, ILogger<DatabaseService> log)
+        {
+            _log = log;
+            _config = config.Value;
+        }
 
 		public void AuditMessageInDatabase(string message)
 		{
-			using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-			{
-				var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
-				connection.Query(query, new AuditMessageModel { Message = message });
-			}
-		}
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
+                {
+                    var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
+                    connection.Query(query, new AuditMessageModel {Message = message});
+                }
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Could not audit message {message} in database", message);
+            }
+        }
 
 		public List<string> GetWeeklyRating(bool onlyActiveUsers)
 		{

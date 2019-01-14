@@ -11,6 +11,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ITKPI.CodewarsBot.Tests.Fixture
 {
+
+    [CollectionDefinition("IntegrationTests")]
+    public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
+    {
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
+    }
+
     public class IntegrationTestFixture : TestServer, IAsyncLifetime
     {
         public IntegrationTestFixture()

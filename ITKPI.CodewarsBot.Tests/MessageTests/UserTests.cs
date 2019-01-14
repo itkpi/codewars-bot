@@ -10,7 +10,8 @@ using Xunit;
 
 namespace ITKPI.CodewarsBot.Tests.MessageTests
 {
-    public class UserTests : IClassFixture<IntegrationTestFixture>
+    [Collection("IntegrationTests")]
+    public class UserTests
     {
         private readonly IMessageService _sut;
         private readonly IUsersRepository _usersRepository;

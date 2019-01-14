@@ -8,7 +8,8 @@ using Xunit;
 
 namespace ITKPI.CodewarsBot.Tests.MessageTests
 {
-    public class FaqTest : IClassFixture<IntegrationTestFixture>
+    [Collection("IntegrationTests")]
+    public class FaqTest
     {
         private readonly IMessageService _sut;
 
