@@ -1,43 +1,32 @@
-﻿using System;
+﻿using Codewars_Bot.Contracts;
+using Codewars_Bot.Models;
+using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using Dapper;
-using ITKPI.CodewarsBot.Api.Configuration;
-using ITKPI.CodewarsBot.Api.Contracts;
-using ITKPI.CodewarsBot.Api.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Codewars_Bot.Configuration;
 
-namespace ITKPI.CodewarsBot.Api.Services
+namespace Codewars_Bot.DataAccess
 {
 	public class DatabaseService : IDatabaseService
 	{
-        private readonly ILogger<DatabaseService> _log;
-        private readonly DbConfig _config;
+	    private readonly DbConfig _config;
 
-	    public DatabaseService(IOptions<DbConfig> config, ILogger<DatabaseService> log)
-        {
-            _log = log;
-            _config = config.Value;
-        }
+	    public DatabaseService(DbConfig config)
+	    {
+	        _config = config;
+	    }
 
 		public void AuditMessageInDatabase(string message)
 		{
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-                {
-                    var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
-                    connection.Query(query, new AuditMessageModel {Message = message});
-                }
-            }
-            catch (Exception e)
-            {
-                _log.LogError(e, "Could not audit in db message {message}", message);
-            }
-        }
+			using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
+			{
+				var query = $"INSERT INTO [Audit].[Messages] (Message, DateTime) VALUES (@Message, GETDATE())";
+				connection.Query(query, new AuditMessageModel { Message = message });
+			}
+		}
 
 		public List<string> GetWeeklyRating(bool onlyActiveUsers)
 		{
@@ -170,52 +159,6 @@ namespace ITKPI.CodewarsBot.Api.Services
 			{
 				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
 				return new List<string>();
-			}
-		}
-
-		public string DeleteUserInfo(int userId)
-		{
-			try
-			{
-				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-				{
-					string query = $@"DELETE FROM [User].[Users] WHERE TelegramId = {userId}";
-
-					connection.Query(query);
-					return "Видалення пройшло успішно";
-				}
-			}
-			catch (Exception ex)
-			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}");
-				return $"Не вдалось видалити дані: {ex.Message}";
-			}
-		}
-
-		public string SaveUserToDatabase(UserModel user)
-		{
-			try
-			{
-				using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-				{
-					string query = "INSERT INTO [User].[Users](CodewarsUsername,CodewarsFullname,TelegramUsername,TelegramId,DateTime,Points) values(@CodewarsUsername,@CodewarsFullname,@TelegramUsername,@TelegramId,GETDATE(),@Points); SELECT CAST(SCOPE_IDENTITY() as int)";
-					var ra = connection.Query<int>(query, user).SingleOrDefault();
-					return $"Реєстрація успішна! Спасибі і хай ваш код завжди компілиться з першого разу :-)";
-				}
-			}
-			catch (Exception ex)
-			{
-				AuditMessageInDatabase($"EXCEPTION: {ex.Message}, CodewarsUser: {user.CodewarsUsername}");
-				return $"Не вдалось створити користувача: {ex.Message}";
-			}
-		}
-
-		public UserModel GetUserById(int userId)
-		{
-			using (SqlConnection connection = new SqlConnection(_config.DbConnectionString))
-			{
-				string query = $"SELECT * FROM [User].[Users] WHERE TelegramId = {userId}";
-				return connection.QueryFirstOrDefault<UserModel>(query);
 			}
 		}
 
