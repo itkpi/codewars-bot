@@ -46,7 +46,7 @@ namespace ITKPI.CodewarsBot.Api
             services.TryAddTransient<IDatabaseService, DatabaseService>();
             services.TryAddSingleton<ICodewarsApiClient, CodewarsApiClient>();
 
-            if (bool.TryParse(_configuration["RunMigration"], out var runMigration) && runMigration)
+            if (false && bool.TryParse(_configuration["RunMigration"], out var runMigration) && runMigration)
             {
                 var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 var migrationsPath = Path.Combine(currentDirectory, _configuration["MigrationFilePath"]);
